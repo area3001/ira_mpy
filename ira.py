@@ -62,7 +62,7 @@ class Ira:
     
     def _parse_message(self, msg):
         try:
-            data = msg.data.split()
+            data = msg.data.split(' ', 1)
             if len(data) == 0:
                 return
             
