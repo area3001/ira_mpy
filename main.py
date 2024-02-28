@@ -5,6 +5,14 @@ from ira import Ira
 from machine import Pin
 from neopixel import NeoPixel
 
+ssid = "area3001_iot"
+ssid_pwd = "hackerspace"
+
+device_id = "0001"
+device_name = "Badge Daan"
+device_hardware = "area3001_badge"
+device_version = "2024"
+
 pixel_count = 26
 pin = Pin(2, Pin.OUT)
 np = NeoPixel(pin, pixel_count)
@@ -48,13 +56,13 @@ async def main():
         print('connecting to network...')
         sta_if.active(True)
         sta_if.config(hidden=True)
-        sta_if.connect('area3001_iot', 'hackerspace')
+        sta_if.connect(ssid, ssid_pwd)
         while not sta_if.isconnected():
             pass
     
     print('network config:', sta_if.ifconfig())
 
-    i = Ira('my_id', 'my_name', 'ira', '2024')
+    i = Ira(device_id, device_name, device_hardware, device_version)
     i.register_handler('set_pixel', set_neopixel_rgb)
     i.register_handler('clear_pixels', clear_neopixel_rgb)
     
