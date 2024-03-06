@@ -67,7 +67,9 @@ class Ira:
                 return
             
             if data[0] in self.handlers:
-                self.handlers[data[0]](data)
+                res = self.handlers[data[0]](data)
+                if msg.reply is not None and res is not None:
+                    self.c.publish(msg.reply, res)
             else:
                 raise ValueError('unknown command %s' % data[0])
             
