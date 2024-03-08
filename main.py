@@ -8,17 +8,22 @@ from neopixel import NeoPixel
 ssid = "area3001"
 ssid_pwd = "hackerspace"
 
-device_id = "0001"
-device_name = "Badge Daan"
-device_hardware = "area3001_badge"
+device_id = "0002"
+device_name = "IRA von Kris"
+device_hardware = "IRA115"
 device_version = "2024.1"
 
 pixel_count = 26
 pin = Pin(2, Pin.OUT)
 np = NeoPixel(pin, pixel_count)
 
-
+# For MAC
 # nats publish -s nats://demo.nats.io:4222 area3001.ira.default.output 'set_pixel 0 #ff0000'
+
+# For Windows (Go) command
+# nats-pub -s nats://demo.nats.io:4222 area3001.ira.default.output 'set_pixel 0 #ff0000'
+# nats-pub -s nats://demo.nats.io:4222 area3001.ira.default.output 'clear_pixels'
+
 def set_neopixel_rgb(data):
     #print(data)
     
@@ -50,24 +55,31 @@ def clear_neopixel_rgb(data):
 
 
 async def main():
-    import network
-    sta_if = network.WLAN(network.STA_IF)
+    print('Boot up IRA version: {}'.format(device_version))
+    #ACTIVATE WIFI, CONNECT TO ROUTER
+    wlan = network.WLAN(network.STA_IF) #Stands for Station Interface
     
-    if not sta_if.isconnected():
-        print('connecting to network...')
-        sta_if.active(True)
-        #sta_if.config(hidden=True)
-        sta_if.connect(ssid, ssid_pwd)
-        while not sta_if.isconnected():
-            pass
+    if wlan.isconnected():
+        print('We are already in connected state')
+    else:
+        print('We are not connected to network...')
+        wlan.active(False)
+        wlan.active(True)
+        #sta_if.config(hidden=True) #@Hackerspace the wifi is hidden.
+        print("Connecting to router...")
+        
+        #CHECK IF CONNECTED TO WLAN
+        while not wlan.isconnected():
+            pass# LOOP UNTIL CONNECTED
     
-    print('network config:', sta_if.ifconfig())
+    print("Retrieving Network Configuration")
+    print('network config:', wlan.ifconfig())
 
     i = Ira(device_id, device_name, device_hardware, device_version)
     i.register_handler('set_pixel', set_neopixel_rgb)
     i.register_handler('clear_pixels', clear_neopixel_rgb)
-    
+
     await i.listen()
     print('listening to ira messages')
-
+        
 asyncio.run(main())
