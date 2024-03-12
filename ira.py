@@ -29,7 +29,7 @@ class Ira:
     async def listen(self):
         self.c.connect()
         asyncio.create_task(self._heartbeat_loop())
-        print('nats server connected')
+        print('NATS server connected')
 
         self.c.subscribe('area3001.ira.{}.devices.{}.output'.format(self.group, self.id), self._parse_message)
         self.c.subscribe('area3001.ira.{}.output'.format(self.group), self._parse_message)
@@ -39,11 +39,11 @@ class Ira:
         
     
     async def _heartbeat_loop(self):
-        print('heartbeat')
+        print('Heartbeat')
         while True:
             self.c.publish('area3001.ira.{}.devices.{}'.format(self.group, self.id), self._heartbeat_msg())
-            print('sent heartbeat')
-            await asyncio.sleep_ms(30_000)
+            print('Sent heartbeat')
+            await asyncio.sleep_ms(3_000)
             
     def _heartbeat_msg(self):
         return json.dumps({
@@ -74,4 +74,4 @@ class Ira:
                 raise ValueError('unknown command %s' % data[0])
             
         except Exception as t:
-            print('failed to process message \"%s\": %s' % (msg.data, t))
+            print('Failed to process message \"%s\": %s' % (msg.data, t))

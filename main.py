@@ -80,6 +80,6 @@ async def main():
     i.register_handler('clear_pixels', clear_neopixel_rgb)
 
     await i.listen()
-    print('listening to ira messages')
+    print('Listening to ira messages')
         
 asyncio.run(main())
