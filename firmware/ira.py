@@ -16,34 +16,33 @@ class Ira:
         self.hw_version = hw_version
         self.mode = 0
         
-        self.c = nats.Connection('nats://demo.nats.io:4222')
+        self.c = nats.Connection('nats://demo.nats.io:4222', debug=True)
         self.ht = None
         self.handlers = {}
         
-    def close(self):
-        self.done.set()
+    async def close(self):
+        await self.c.close()
         
     def register_handler(self, command, cb):
         self.handlers[command] = cb
         
     async def listen(self):
-        self.c.connect()
+        await self.c.connect()
+
         asyncio.create_task(self._heartbeat_loop())
         print('nats server connected')
 
-        self.c.subscribe('area3001.ira.{}.devices.{}.output'.format(self.group, self.id), self._parse_message)
-        self.c.subscribe('area3001.ira.{}.output'.format(self.group), self._parse_message)
-        
-        self.ht = asyncio.create_task(self.c.wait())
-        await self.ht
-        
-    
+        await self.c.subscribe('area3001.ira.{}.devices.{}.output'.format(self.group, self.id), self._parse_message)
+        await self.c.subscribe('area3001.ira.{}.output'.format(self.group), self._parse_message)
+
+        asyncio.create_task(self.c.wait())
+
     async def _heartbeat_loop(self):
         print('heartbeat')
         while True:
-            self.c.publish('area3001.ira.{}.devices.{}'.format(self.group, self.id), self._heartbeat_msg())
+            await self.c.publish('area3001.ira.{}.devices.{}'.format(self.group, self.id), self._heartbeat_msg())
             print('sent heartbeat')
-            await asyncio.sleep_ms(30_000)
+            await asyncio.sleep(10)
             
     def _heartbeat_msg(self):
         return json.dumps({
@@ -60,16 +59,16 @@ class Ira:
             }
         })
     
-    def _parse_message(self, msg):
+    async def _parse_message(self, msg):
         try:
             data = msg.data.split(' ', 1)
             if len(data) == 0:
                 return
             
             if data[0] in self.handlers:
-                res = self.handlers[data[0]](data)
+                res = await self.handlers[data[0]](data)
                 if msg.reply is not None and res is not None:
-                    self.c.publish(msg.reply, res)
+                    await self.c.publish(msg.reply, res)
             else:
                 raise ValueError('unknown command %s' % data[0])
             

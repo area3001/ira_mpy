@@ -19,7 +19,7 @@ np = NeoPixel(pin, pixel_count)
 
 
 # nats publish -s nats://demo.nats.io:4222 area3001.ira.default.output 'set_pixel 0 #ff0000'
-def set_neopixel_rgb(data):
+async def set_neopixel_rgb(data):
     #print(data)
     
     if len(data) != 2:
@@ -40,8 +40,9 @@ def set_neopixel_rgb(data):
         np[addr] = color
 
     np.write()
-    
-def clear_neopixel_rgb(data):
+
+
+async def clear_neopixel_rgb(data):
     for i in range(pixel_count - 1):
         np[i] = (0, 0, 0)
         
@@ -49,10 +50,10 @@ def clear_neopixel_rgb(data):
     print('clearing all neopixels')
 
 
-async def main():
+def main():
     import network
     sta_if = network.WLAN(network.STA_IF)
-    
+
     if not sta_if.isconnected():
         print('connecting to network...')
         sta_if.active(True)
@@ -60,14 +61,16 @@ async def main():
         sta_if.connect(ssid, ssid_pwd)
         while not sta_if.isconnected():
             pass
-    
+
     print('network config:', sta_if.ifconfig())
 
     i = Ira(device_id, device_name, device_hardware, device_version)
     i.register_handler('set_pixel', set_neopixel_rgb)
     i.register_handler('clear_pixels', clear_neopixel_rgb)
-    
-    await i.listen()
+
+    asyncio.run(i.listen())
     print('listening to ira messages')
 
-asyncio.run(main())
+    asyncio.get_event_loop().run_forever()
+
+main()
