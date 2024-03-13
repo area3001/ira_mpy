@@ -5,15 +5,16 @@ from ira import Ira
 from machine import Pin
 from neopixel import NeoPixel
 
-ssid = "area3001"
-ssid_pwd = "hackerspace"
+ssid = "Nobelsoft"
+ssid_pwd = "potvolkoffie"
 
 device_id = "0002"
 device_name = "IRA von Kris"
 device_hardware = "IRA115"
 device_version = "2024.1"
 
-pixel_count = 26
+pixel_count = 30
+pixel_count = 30
 pin = Pin(2, Pin.OUT)
 np = NeoPixel(pin, pixel_count)
 
@@ -67,6 +68,7 @@ async def main():
         wlan.active(True)
         #sta_if.config(hidden=True) #@Hackerspace the wifi is hidden.
         print("Connecting to router...")
+        wlan.connect(ssid, ssid_pwd)
         
         #CHECK IF CONNECTED TO WLAN
         while not wlan.isconnected():
