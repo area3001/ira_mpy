@@ -5,8 +5,8 @@ from ira import Ira
 from machine import Pin
 from neopixel import NeoPixel
 
-ssid = "Nobelsoft"
-ssid_pwd = "potvolkoffie"
+ssid = "area3001"
+ssid_pwd = "hackerspace"
 
 device_id = "0002"
 device_name = "IRA von Kris"
