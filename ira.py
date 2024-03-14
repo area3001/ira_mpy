@@ -28,7 +28,7 @@ class Ira:
     async def listen(self):
         self.c.connect()
         
-        print('Connected to NATS server: ', config.natsServer)
+        print('Connected to NATS server:', config.natsServer)
 
         self.c.subscribe('area3001.ira.{}.devices.{}.output'.format(self.group, self.id), self._parse_message)
         self.c.subscribe('area3001.ira.{}.output'.format(self.group), self._parse_message)
