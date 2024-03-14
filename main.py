@@ -52,6 +52,10 @@ async def main():
 
 """)
     print('Boot up IRA version: {}'.format(config.device_version))
+    print('Deviceid:',config.device_id)
+    print('Device Name:',config.device_name,)
+    print('Hardware:', config.device_hardware)
+    
     #ACTIVATE WIFI, CONNECT TO ROUTER
     wlan = network.WLAN(network.STA_IF) #Stands for Station Interface
     
