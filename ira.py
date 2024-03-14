@@ -2,12 +2,11 @@ import asyncio
 import network
 import json
 import ubinascii
-
 import nats
-
+import config
 
 class Ira:
-    def __init__(self, id, name, hw_type, hw_version, group="default", url='nats://demo.nats.io:4222'):
+    def __init__(self, id, name, hw_type, hw_version, group="default", url=config.natsServer):
         self.id = id
         self.name = name
         self.group = group
@@ -16,7 +15,7 @@ class Ira:
         self.hw_version = hw_version
         self.mode = 0
         
-        self.c = nats.Connection('nats://demo.nats.io:4222')
+        self.c = nats.Connection(config.natsServer)
         self.ht = None
         self.handlers = {}
         
@@ -28,16 +27,19 @@ class Ira:
         
     async def listen(self):
         self.c.connect()
-        asyncio.create_task(self._heartbeat_loop())
-        print('NATS server connected')
+        
+        print('Connected to NATS server: ', config.natsServer)
 
         self.c.subscribe('area3001.ira.{}.devices.{}.output'.format(self.group, self.id), self._parse_message)
         self.c.subscribe('area3001.ira.{}.output'.format(self.group), self._parse_message)
-        
         self.ht = asyncio.create_task(self.c.wait())
+        #asyncio.create_task(self._heartbeat_loop())
         await self.ht
-        
     
+    async def _actie(self):
+        self.c.publish('area3001.ira.{}.devices.{}'.format(self.group, self.id), self._heartbeat_msg())
+        print('Sent heartbeat')
+        
     async def _heartbeat_loop(self):
         print('Heartbeat')
         while True:
