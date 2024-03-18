@@ -4,10 +4,10 @@ import json
 import ubinascii
 
 import nats
-
+import config
 
 class Ira:
-    def __init__(self, id, name, hw_type, hw_version, group="default", url='nats://demo.nats.io:4222'):
+    def __init__(self, id, name, hw_type, hw_version, group="default", url=config.natsServer):
         self.id = id
         self.name = name
         self.group = group
@@ -16,7 +16,7 @@ class Ira:
         self.hw_version = hw_version
         self.mode = 0
         
-        self.c = nats.Connection('nats://demo.nats.io:4222', debug=True)
+        self.c = nats.Connection(config.natsServer, debug=True)
         self.ht = None
         self.handlers = {}
         
@@ -30,7 +30,7 @@ class Ira:
         await self.c.connect()
 
         asyncio.create_task(self._heartbeat_loop())
-        print('nats server connected')
+        print('Connected to NATS server:', config.natsServer)
 
         await self.c.subscribe('area3001.ira.{}.devices.{}.output'.format(self.group, self.id), self._parse_message)
         await self.c.subscribe('area3001.ira.{}.output'.format(self.group), self._parse_message)
@@ -38,10 +38,10 @@ class Ira:
         asyncio.create_task(self.c.wait())
 
     async def _heartbeat_loop(self):
-        print('heartbeat')
+        print('Heartbeat')
         while True:
             await self.c.publish('area3001.ira.{}.devices.{}'.format(self.group, self.id), self._heartbeat_msg())
-            print('sent heartbeat')
+            print('Sent heartbeat')
             await asyncio.sleep(10)
             
     def _heartbeat_msg(self):
@@ -70,7 +70,7 @@ class Ira:
                 if msg.reply is not None and res is not None:
                     await self.c.publish(msg.reply, res)
             else:
-                raise ValueError('unknown command %s' % data[0])
+                raise ValueError('Unknown command %s' % data[0])
             
         except Exception as t:
-            print('failed to process message \"%s\": %s' % (msg.data, t))
+            print('Failed to process message \"%s\": %s' % (msg.data, t))
