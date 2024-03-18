@@ -56,6 +56,9 @@ def main():
     print('Device Name:',config.device_name,)
     print('Hardware:', config.device_hardware)
     
+    print('Pinout number:', config.pinOutNumber)
+    print('Leds count:', config.pixel_count)
+    
     #ACTIVATE WIFI, CONNECT TO ROUTER
     wlan = network.WLAN(network.STA_IF) #Stands for Station Interface
     
