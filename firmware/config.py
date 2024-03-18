@@ -4,11 +4,8 @@
 #  | ||  _ <  / ___ \
 # |___|_| \_\/_/   \_\
 
-# wifi_ssid = "YOUR WIFI ACCESSPOINT"
-# wifi_password  = "YOUR PASSWORD"
-
-wifi_ssid = "Nobelsoft"
-wifi_password  = "Potvolkoffie"
+wifi_ssid = "YOUR WIFI ACCESSPOINT"
+wifi_password  = "YOUR PASSWORD"
 
 pixel_count = 4
 pinOutNumber = 2
