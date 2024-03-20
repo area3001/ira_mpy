@@ -268,7 +268,7 @@ class Connection(object):
             sid=sid,
             subject=data['subject'],
             size=int(data['size']),
-            data=self._readline(),
+            data=(await self._readline()).strip(),
             reply=data['reply'].strip() if data['reply'] is not None else None
         )
 
