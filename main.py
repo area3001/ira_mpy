@@ -52,8 +52,8 @@ def main():
 
     """)
     print('Boot up IRA version: {}'.format(config.device_version))
-    print('Deviceid:',config.device_id)
-    print('Device Name:',config.device_name,)
+    print('Deviceid:', config.device_id)
+    print('Device Name:', config.device_name, )
     print('Hardware:', config.device_hardware)
     
     print('Pinout number:', config.pinOutNumber)

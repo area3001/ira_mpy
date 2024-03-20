@@ -140,8 +140,7 @@ class Connection(object):
         else:
             command = 'PUB %s %s %d' % (subject, reply, len(msg))
 
-        await self._send(command)
-        await self._send(msg)
+        await self._send(command + '\r\n' + msg)
 
     async def request(self, subject, callback, msg=None):
         """

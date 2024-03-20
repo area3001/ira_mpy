@@ -4,16 +4,16 @@
 #  | ||  _ <  / ___ \
 # |___|_| \_\/_/   \_\
 
-wifi_ssid = "YOUR WIFI ACCESSPOINT"
-wifi_password  = "YOUR PASSWORD"
+wifi_ssid = "area3001"
+wifi_password  = "hackerspace"
 
-pixel_count = 4
+pixel_count = 26
 pinOutNumber = 2
 
 enable_debugging = False
 
-device_id = "0004"
-device_name = "2e Badge von Kris"
+device_id = "0001"
+device_name = "Daan"
 device_hardware = "Badge"
 device_version = "2024.2"
 
