@@ -172,7 +172,7 @@ class Connection(object):
         """
         start = utime.time()
         total = 0
-        print("waiting")
+        print("Waiting")
         while True:
             type, result = await self._recv(MSG, PING, OK)
             if type is MSG:

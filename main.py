@@ -1,6 +1,7 @@
 import config
 import asyncio
 import network
+import time
 from ira import Ira
 
 from machine import Pin
@@ -15,14 +16,14 @@ async def set_neopixel_rgb(data):
     
     #check for valid data like this ['set_pixel', '0 #00ff00']
     if len(data) != 2:
-        print('no command arguments')
+        print('No command arguments')
         return
     
     pairs = data[1].split(',')
     for p in pairs:
         addr_color = p.split()
         if len(addr_color) != 2:
-            print('invalid argument pairs {}' % p)
+            print('Invalid argument pairs {}' % p)
             return
         
         color = addr_color[1].lstrip('#')
@@ -62,6 +63,9 @@ def main():
     #ACTIVATE WIFI, CONNECT TO ROUTER
     wlan = network.WLAN(network.STA_IF) #Stands for Station Interface
     
+    connection_timeout = 10  # Timeout in seconden
+    start_time = time.time()
+
     if wlan.isconnected():
         print('We are already in connected state with wifi.')
     else:
@@ -74,10 +78,16 @@ def main():
         
         #CHECK IF CONNECTED TO WLAN
         while not wlan.isconnected():
-            pass# LOOP UNTIL CONNECTED
+            if time.time() - start_time > connection_timeout:
+                print("Failed to connect within the timeout period. Please check your Wifi credentials.")
+            break  # Verlaat de lus als we de timeout hebben bereikt
+            #pass# LOOP UNTIL CONNECTED
     
-    print("Retrieving Network Configuration from: [", config.wifi_ssid, "].")
-    print('Network config:', wlan.ifconfig())
+    if wlan.isconnected():
+        print("Retrieving Network Configuration from: [", config.wifi_ssid, "].")
+        print('Network config:', wlan.ifconfig())
+    else:
+        print("Not connected to WiFi. Please check your SSID and password.")
 
     #Send clear event when we do soft reboot, (leds can still be lighting up)
     clear_neopixel_rgb(None)
@@ -87,7 +97,7 @@ def main():
     i.register_handler('clear_pixels', clear_neopixel_rgb)
 
     asyncio.run(i.listen())
-    print('listening to ira messages')
+    print('Listening to ira messages')
 
     asyncio.get_event_loop().run_forever()
 

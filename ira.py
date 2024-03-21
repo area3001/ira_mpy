@@ -16,7 +16,7 @@ class Ira:
         self.hw_version = hw_version
         self.mode = 0
         
-        self.c = nats.Connection(config.natsServer, debug=True)
+        self.c = nats.Connection(config.natsServer, debug=config.enable_debugging)
         self.ht = None
         self.handlers = {}
         
@@ -38,11 +38,11 @@ class Ira:
         asyncio.create_task(self.c.wait())
 
     async def _heartbeat_loop(self):
-        print('Heartbeat')
+        print('Start heartbeat loop')
         while True:
             await self.c.publish('area3001.ira.{}.devices.{}'.format(self.group, self.id), self._heartbeat_msg())
             print('Sent heartbeat')
-            await asyncio.sleep(10)
+            await asyncio.sleep(config.heardbeat_interval)
             
     def _heartbeat_msg(self):
         return json.dumps({
