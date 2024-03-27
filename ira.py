@@ -4,10 +4,10 @@ import json
 import ubinascii
 
 import nats
-
+import config
 
 class Ira:
-    def __init__(self, id, name, hw_type, hw_version, group="default", url='nats://demo.nats.io:4222'):
+    def __init__(self, id, name, hw_type, hw_version, group="default", url=config.natsServer):
         self.id = id
         self.name = name
         self.group = group
@@ -16,34 +16,33 @@ class Ira:
         self.hw_version = hw_version
         self.mode = 0
         
-        self.c = nats.Connection('nats://demo.nats.io:4222')
+        self.c = nats.Connection(config.natsServer, debug=config.enable_debugging)
         self.ht = None
         self.handlers = {}
         
-    def close(self):
-        self.done.set()
+    async def close(self):
+        await self.c.close()
         
     def register_handler(self, command, cb):
         self.handlers[command] = cb
         
     async def listen(self):
-        self.c.connect()
-        asyncio.create_task(self._heartbeat_loop())
-        print('nats server connected')
+        await self.c.connect()
 
-        self.c.subscribe('area3001.ira.{}.devices.{}.output'.format(self.group, self.id), self._parse_message)
-        self.c.subscribe('area3001.ira.{}.output'.format(self.group), self._parse_message)
-        
-        self.ht = asyncio.create_task(self.c.wait())
-        await self.ht
-        
-    
+        asyncio.create_task(self._heartbeat_loop())
+        print('Connected to NATS server:', config.natsServer)
+
+        await self.c.subscribe('area3001.ira.{}.devices.{}.output'.format(self.group, self.id), self._parse_message)
+        await self.c.subscribe('area3001.ira.{}.output'.format(self.group), self._parse_message)
+
+        asyncio.create_task(self.c.wait())
+
     async def _heartbeat_loop(self):
-        print('heartbeat')
+        print('Start heartbeat loop')
         while True:
-            self.c.publish('area3001.ira.{}.devices.{}'.format(self.group, self.id), self._heartbeat_msg())
-            print('sent heartbeat')
-            await asyncio.sleep_ms(30_000)
+            await self.c.publish('area3001.ira.{}.devices.{}'.format(self.group, self.id), self._heartbeat_msg())
+            print('Sent heartbeat')
+            await asyncio.sleep(config.heardbeat_interval)
             
     def _heartbeat_msg(self):
         return json.dumps({
@@ -60,18 +59,18 @@ class Ira:
             }
         })
     
-    def _parse_message(self, msg):
+    async def _parse_message(self, msg):
         try:
             data = msg.data.split(' ', 1)
             if len(data) == 0:
                 return
             
             if data[0] in self.handlers:
-                res = self.handlers[data[0]](data)
+                res = await self.handlers[data[0]](data)
                 if msg.reply is not None and res is not None:
-                    self.c.publish(msg.reply, res)
+                    await self.c.publish(msg.reply, res)
             else:
-                raise ValueError('unknown command %s' % data[0])
+                raise ValueError('Unknown command %s' % data[0])
             
         except Exception as t:
-            print('failed to process message \"%s\": %s' % (msg.data, t))
+            print('Failed to process message \"%s\": %s' % (msg.data, t))
