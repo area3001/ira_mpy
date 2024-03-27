@@ -4,10 +4,13 @@ import json
 import ubinascii
 
 import nats
-import config
+from machine import Pin
+from neopixel import NeoPixel
+import net
 
-class Ira:
-    def __init__(self, id, name, hw_type, hw_version, group="default", url=config.natsServer):
+
+class Device:
+    def __init__(self, id, name, hw_type, hw_version, group="default", url="nats://demo.nats.io"):
         self.id = id
         self.name = name
         self.group = group
@@ -15,8 +18,13 @@ class Ira:
         self.hw_type = hw_type
         self.hw_version = hw_version
         self.mode = 0
+        self.url = url
+
+        self.protocol = net.Protocol(self)
+
+        self.outputs = []
         
-        self.c = nats.Connection(config.natsServer, debug=True)
+        self.c = nats.Connection(url, debug=True)
         self.ht = None
         self.handlers = {}
         
@@ -25,12 +33,21 @@ class Ira:
         
     def register_handler(self, command, cb):
         self.handlers[command] = cb
+
+    def enable_neopixel_support(self):
+        self.register_handler('set_pixel', self.protocol.set_neopixel_rgb)
+        self.register_handler('clear_pixels', self.protocol.clear_neopixel_rgb)
+
+    def register_neopixel_output(self, pin, count):
+        np = NeoPixel(Pin(pin), count)
+        self.outputs.append(np)
+        return self.outputs.index(np)
         
     async def listen(self):
         await self.c.connect()
 
         asyncio.create_task(self._heartbeat_loop())
-        print('Connected to NATS server:', config.natsServer)
+        print('Connected to NATS server:', self.url)
 
         await self.c.subscribe('area3001.ira.{}.devices.{}.output'.format(self.group, self.id), self._parse_message)
         await self.c.subscribe('area3001.ira.{}.output'.format(self.group), self._parse_message)
@@ -38,10 +55,8 @@ class Ira:
         asyncio.create_task(self.c.wait())
 
     async def _heartbeat_loop(self):
-        print('Heartbeat')
         while True:
             await self.c.publish('area3001.ira.{}.devices.{}'.format(self.group, self.id), self._heartbeat_msg())
-            print('Sent heartbeat')
             await asyncio.sleep(10)
             
     def _heartbeat_msg(self):

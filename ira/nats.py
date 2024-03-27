@@ -33,7 +33,6 @@ class Subscription(object):
 DEFAULT_URI = 'nats://192.168.1.3:4222'
 
 
-
 class Connection(object):
     """
     A Connection represents a bare connection to a nats-server.
