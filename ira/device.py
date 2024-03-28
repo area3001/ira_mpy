@@ -6,7 +6,7 @@ import ubinascii
 import nats
 from machine import Pin
 from neopixel import NeoPixel
-import net
+import handlers
 
 
 class Device:
@@ -20,7 +20,7 @@ class Device:
         self.mode = 0
         self.url = url
 
-        self.protocol = net.Protocol(self)
+        self.protocol = handlers.Protocol(self)
 
         self.outputs = []
         
