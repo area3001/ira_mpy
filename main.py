@@ -6,10 +6,6 @@ from ira.device import Device
 
 cfg = config.Config()
 
-# nats publish -s nats://demo.nats.io:4222 area3001.ira.default.output 'set_pixel 0 #ff0000'
-
-    
-
 def main():
     print("""
      ___ ____      _    

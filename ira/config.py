@@ -83,11 +83,3 @@ class Config:
 
     def persist(self):
         self._nvs.commit()
-
-
-# For MAC
-# nats publish -s nats://demo.nats.io:4222 area3001.ira.default.output 'set_pixel 0 #ff0000'
-
-# For Windows (Go) command
-# nats-pub -s nats://demo.nats.io:4222 area3001.ira.default.output 'set_pixel 0 #ff0000'
-# nats-pub -s nats://demo.nats.io:4222 area3001.ira.default.output 'clear_pixels'
