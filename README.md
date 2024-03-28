@@ -106,6 +106,11 @@ We adopt 2 styles of documentation:
 - Implement FX
 - Implement DMX
 - Implement Dual Core support
-- Command white_pixels
-- Command config_change
-- Command set_pixel : check if pixel ID is not larger then pixel_count
+- Commands  
+  * Command white_pixels
+  * Command config_change
+  * Command set_pixel: check if pixel ID is not larger then pixel_count
+  * Command set_pixel: allow for range support, or implement dedicated command 'set_pixel_range 1-10#ff0000,15-30#00ff00'
+- Implement OTA
+- Implement IR Config
+- Implement IR Blaster reactive behavior   
