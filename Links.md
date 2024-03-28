@@ -23,3 +23,8 @@ Ordered alphabetically.
 
 ## Setup
 - https://micropython-stubs.readthedocs.io/en/main/24_pycharm.html
+
+## UserMods
+- https://micropython-usermod.readthedocs.io/en/latest/index.html
+- https://forum.micropython.org/viewtopic.php?t=12267
+- https://docs.micropython.org/en/latest/develop/cmodules.html
