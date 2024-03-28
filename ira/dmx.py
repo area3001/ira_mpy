@@ -2,8 +2,9 @@
 #
 # Needs to be rewritten to asyncio
 
-from machine import UART, Pin, udelay
+from machine import UART, Pin
 from array import array
+from time import sleep_us
 
 tx_pins = [None, 'X9', 'X3', 'Y9', 'X1', None, 'Y1']
 
@@ -38,7 +39,7 @@ class universe():
         # 77uS us used because of time it takes to init pin
         dmx_uart = Pin(tx_pins[self.port], Pin.OUT_PP)
         dmx_uart.value(0)
-        udelay(74)
+        sleep_us(74)
         dmx_uart.value(1)
 
         # Now turn into a UART port and send DMX data

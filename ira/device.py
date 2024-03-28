@@ -8,7 +8,6 @@ from machine import Pin
 from neopixel import NeoPixel
 import handlers
 
-
 class Device:
     def __init__(self, id, name, hw_type, hw_version, group="default", url="nats://demo.nats.io"):
         self.id = id
