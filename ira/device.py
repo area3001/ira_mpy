@@ -35,8 +35,7 @@ class Device:
         self.handlers[command] = cb
 
     def enable_neopixel_support(self):
-        self.register_handler('set_pixel', self.protocol.set_neopixel_rgb)
-        self.register_handler('clear_pixels', self.protocol.clear_neopixel_rgb)
+        self.register_handler('rgb', self.protocol.set_rgb)
 
     def register_neopixel_output(self, pin, count):
         np = NeoPixel(Pin(pin), count)
@@ -49,8 +48,8 @@ class Device:
         asyncio.create_task(self._heartbeat_loop())
         print('Connected to NATS server:', self.url)
 
-        await self.c.subscribe('area3001.ira.{}.devices.{}.output'.format(self.group, self.id), self._parse_message)
-        await self.c.subscribe('area3001.ira.{}.output'.format(self.group), self._parse_message)
+        await self.c.subscribe('area3001.ira.{}.devices.{}.output.>'.format(self.group, self.id), self._parse_message)
+        await self.c.subscribe('area3001.ira.{}.output.>'.format(self.group), self._parse_message)
 
         asyncio.create_task(self.c.wait())
 
@@ -76,16 +75,14 @@ class Device:
     
     async def _parse_message(self, msg):
         try:
-            data = msg.data.split(' ', 1)
-            if len(data) == 0:
-                return
+            out_cmd = msg.subject.split('.')[-2:]
             
-            if data[0] in self.handlers:
-                res = await self.handlers[data[0]](data)
+            if out_cmd[1] in self.handlers:
+                res = await self.handlers[out_cmd[1]](out_cmd[0], msg.data)
                 if msg.reply is not None and res is not None:
                     await self.c.publish(msg.reply, res)
             else:
-                raise ValueError('Unknown command %s' % data[0])
+                raise ValueError('Unknown command %s' % out_cmd[1])
             
         except Exception as t:
             print('Failed to process message \"%s\": %s' % (msg.data, t))

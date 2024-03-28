@@ -4,23 +4,19 @@ class Protocol:
     def __init__(self, device):
         self.device = device
 
-    async def set_neopixel_rgb(self, data):
-        # check for valid data like this ['set_pixel', '0 #00ff00']
-        if len(data) != 2:
+    async def set_rgb(self, output, data):
+        if output < 0 or output >= len(self.device.outputs):
             return False
+        dev = self.device.outputs[output]
 
-        # get the device identifier
-        parts = data[1].split(' ')
-        if len(parts) != 2:
-            return False
+        pairs = data.split(' ')
+        if output == 'dmx':
+            return await self._set_rgb_dmx(output, pairs)
+        else:
+            return await self._set_rgb_neopixel(output, pairs)
 
-        dev_id = int(parts[0])
-        if dev_id < 0 or dev_id >= len(self.device.outputs):
-            return False
-        dev = self.device.outputs[dev_id]
-
-        pairs = data[1].split(',')
-        for i in range(1, len(parts)):
+    async def _set_rgb_neopixel(self, dev, pairs):
+        for i in range(1, len(pairs)):
             addr_color = pairs[i].split('#')
             if len(addr_color) != 2:
                 return False
@@ -36,17 +32,6 @@ class Protocol:
 
         dev.write()
 
-    async def clear_neopixel_rgb(self, data):
-        if len(data) != 2:
-            return False
+    async def _set_rgb_dmx(self, dev, pairs):
+        pass
 
-        dev_id = int(data[1])
-        if dev_id < 0 or dev_id >= len(self.device.outputs):
-            return False
-
-        dev = self.device.outputs[dev_id]
-
-        for i in range(len(dev) - 1):
-            dev[i] = (0, 0, 0)
-
-        dev.write()
