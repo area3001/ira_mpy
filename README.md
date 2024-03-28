@@ -66,6 +66,23 @@ For each of the above topics we have the following split, these are processed wi
 
 ### Messages
 Multiple commands are combined on each topic.
+The message is in ASCII and is space delimited.
+It always starts with a command, that can't contain a space for obvious reasons and is then followed by a sequence of command specific data. The command specific data is comma delimited. Example:
+- <command><space><command_specific_data>
+- 'set_pixel 1#ff0000,20#00ff00' = this sets pixel 1 to Red and pixel 20 to Green
+
+### Commands
+#### set_pixel
+This is to identify a pixel and set its RGB value.
+
+#### clear_pixels
+This sets all pixels to black.
+
+#### white_pixels (TODO)
+This sets all pixels to white.
+
+#### config_change (TODO)
+This identifies a parameter and changes its value.
 
 ## Documentation rules
 We adopt 2 styles of documentation:
@@ -74,4 +91,8 @@ We adopt 2 styles of documentation:
   
 ## TODO
 - Implement topic structure according to individual outputs
--   
+- Implement FX
+- Implement DMX
+- Implement Dual Core support
+- Command white_pixels
+- Command config_change
