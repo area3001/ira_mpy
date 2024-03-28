@@ -28,3 +28,6 @@
 
 
 * https://mischianti.org/micropython-with-esp8266-and-esp32-flashing-firmware-and-using-pycharm-ide-3/
+
+* Instsall micropython stubs
+** pip install micropython-esp32-stubs
