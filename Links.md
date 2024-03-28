@@ -19,3 +19,6 @@ Ordered alphabetically.
 
 ## Neopixels
 - https://docs.micropython.org/en/latest/esp8266/tutorial/neopixel.html
+
+## Setup
+- https://micropython-stubs.readthedocs.io/en/main/24_pycharm.html
