@@ -101,7 +101,9 @@ For the config variables, see the list below.
 
 ## Config variables
 - led_count
-- 
+- dmx_mode = options:
+  * RGB
+  * RGBW
   
 ## Documentation rules
 We adopt 2 styles of documentation:
