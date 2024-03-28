@@ -59,10 +59,8 @@ For each of the above topics we have the following split, these are processed wi
 - <topic>.<1 through 8>.rgb = set raw RGB mode active, disable FX mode and directly control pixelss
 - <topic>.<1 through 8>.fx = set FX mode active, disable rawRGB mode and start FX
 - <topic>.dmx.raw
-- <topic>.dmx.rgb
-- <topic>.dmx.rgbw
-- <topic>.dmx.rgbfx
-- <topic>.dmx.rgbwfx
+- <topic>.dmx.rgb = set DMX output as pixels as RGB or RGBW value (= config variable)
+- <topic>.dmx.fx = set DMX output as FX as RGB or RGBW value (= config variable)
 
 ### Messages
 Multiple commands are combined on each topic.
@@ -96,11 +94,20 @@ This sets all pixels to white. This is implemented for panic mode.
 #### config_change (TODO)
 This identifies a parameter and changes its value.
 
+- CN: 'config_change'
+- CSD: <config_variable><comma><variable_value>
+
+For the config variables, see the list below.
+
+## Config variables
+- led_count
+- 
+  
 ## Documentation rules
 We adopt 2 styles of documentation:
 - MARKDOWN: this is used for files like this README
 - DOXYGEN: this is used for inline documentation in the code
-  
+
 ## TODO
 - Implement topic structure according to individual outputs
 - Implement FX
