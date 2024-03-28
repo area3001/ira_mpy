@@ -19,6 +19,7 @@ Ordered alphabetically.
 
 ## Neopixels
 - https://docs.micropython.org/en/latest/esp8266/tutorial/neopixel.html
+- https://github.com/micropython/micropython/blob/fbd47fc46cce80abfc59e680600666473a1868da/drivers/neopixel/neopixel.py
 - https://forum.micropython.org/viewtopic.php?t=3749
 
 ## Setup
