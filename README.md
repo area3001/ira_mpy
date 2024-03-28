@@ -72,14 +72,26 @@ It always starts with a command, that can't contain a space for obvious reasons 
 - 'set_pixel 1#ff0000,20#00ff00' = this sets pixel 1 to Red and pixel 20 to Green
 
 ### Commands
+- Command Name = CN
+- Command Specific Data = CSD
+  
 #### set_pixel
 This is to identify a pixel and set its RGB value.
+
+- CN: 'set_pixel'
+- CSD: '<pixel ID>#<Hex RGB value>' example: 23#0000FF sets pixel 23 to Blue.
 
 #### clear_pixels
 This sets all pixels to black.
 
+- CN: 'clear_pixels'
+- CSD: None
+
 #### white_pixels (TODO)
-This sets all pixels to white.
+This sets all pixels to white. This is implemented for panic mode.
+
+- CN: 'white_pixels'
+- CSD: None
 
 #### config_change (TODO)
 This identifies a parameter and changes its value.
@@ -96,3 +108,4 @@ We adopt 2 styles of documentation:
 - Implement Dual Core support
 - Command white_pixels
 - Command config_change
+- Command set_pixel : check if pixel ID is not larger then pixel_count
