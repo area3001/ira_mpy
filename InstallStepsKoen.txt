@@ -17,7 +17,7 @@
 
 * Flash Micropython
 ** (MAC & LINUX) esptool.py --chip esp32 --port /dev/ttyUSB0 --baud 460800 write_flash -z 0x1000 esp32-20190125-v1.10.bin
-** (WIN) esptool.exe --chip esp32 --port COM4 --baud 460800 write_flash -z 0x1000 .\Downloads\ESP32_GENERIC-SPIRAM-20240222-v1.22.2.bin
+** (WIN) esptool.exe --chip esp32 --port COM4 --baud 460800 write_flash -z 0x1000 "C:\Downloads\ESP32_GENERIC-SPIRAM-20240222-v1.22.2.bin"
 
 * Download PyCharm https://www.jetbrains.com/pycharm/
 ** Exact link: https://download.jetbrains.com/python/pycharm-community-2023.3.4.exe?_ga=2.20549244.534513860.1710356446-375493018.1710356446
