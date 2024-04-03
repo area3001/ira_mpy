@@ -30,7 +30,7 @@ def PrintWifiSatus(number):
 
     # Print the message or perform any other action needed
     print(message)
-    
+
 
 def main():
     print("""
