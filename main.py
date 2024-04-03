@@ -2,9 +2,11 @@ import config
 import asyncio
 import network
 import time
+import ota
 import sys
-from ira import Ira
+import esp
 
+from ira import Ira
 from machine import Pin
 from neopixel import NeoPixel
 
@@ -35,16 +37,28 @@ async def set_neopixel_rgb(data):
             addr = int(addr_color[0]) #% config.pixel_count #We maken adres positie aan indien het binnen de pixelcount range zit.
             print("Adres:", int(addr_color[0]), "Set:", color)
             np[addr] = color
+            #addr = int(addr_color[0]) % config.pixel_count -> for now just only the Id's we provide. (until we fixed the color problem)
             np.write()
 
-
+ 
 async def clear_neopixel_rgb(data):
     print('Clearing all neopixels!')
     for i in range(config.pixel_count):
-        np[i] = (0, 0, 0)
-        
+        np[i] = (0, 0, 0)       
     np.write()
 
+async def check_for_firmware_update(data):
+    if ota.check_for_firmware_update:
+        # boolean zetten dat update lopende is dan stopt de rest.
+        np.fill((0, 0, 255))  # Blue for update mode
+        np.write()  # Don't forget to call write() to actually update the LEDs
+        await ota.update_firmware()
+        
+async def flash_firmware(data):
+    np.fill((0, 0, 255))  # Blue for update mode
+    np.write()  # Don't forget to call write() to actually update the LEDs
+    await ota.flash_firmware(data)
+    
 def PrintWifiSatus(number):
     #https://mpython.readthedocs.io/en/v2.2.1/library/micropython/network.html
     cases = {
@@ -71,14 +85,16 @@ def main():
     |_ _|  _ \    / \   
      | || |_) |  / _ \  
      | ||  _ <  / ___ \ 
-    |___|_| \_\/_/   \_\
+    |___|_| \_\/_/   \_\\
 
     """)
     print('Boot up IRA version: {}'.format(config.device_version), "running on Python version:", sys.version)
     print('Deviceid:', config.device_id)
     print('Device Name:', config.device_name, )
     print('Hardware:', config.device_hardware)
-    
+    # low level methods to interact with flash storage
+
+    print('ESP32 Flash size:', int(esp.flash_size()/1024/1024), 'MB')
     print('Pinout number:', config.pinOutNumber)
     print('Leds count:', config.pixel_count)
     
@@ -97,7 +113,7 @@ def main():
         print('We are not connected to network...')
         
         #sta_if.config(hidden=True) #@Hackerspace the wifi is hidden.
-        print("Connecting to router...")
+        print('Connecting to router...')
         wlan.connect(config.wifi_ssid, config.wifi_password)  # connect to an AP
         
         while not wlan.isconnected(): # wait till we are really connected
@@ -111,14 +127,17 @@ def main():
     
     #Send clear event when we do soft reboot, (leds can still be lighting up)
     clear_neopixel_rgb(None)
-    # Set all pixels to white
-    np.fill((255, 255, 255))
+    # Set all pixels to yellow
+    np.fill((253, 255, 24))
     np.write()  # Don't forget to call write() to actually update the LEDs
+    print('We are in default yellow mode')
 
     i = Ira(config.device_id, config.device_name, config.device_hardware, config.device_version)
     i.register_handler('set_pixel', set_neopixel_rgb)
     i.register_handler('clear_pixels', clear_neopixel_rgb)
-
+    i.register_handler('update_ira', check_for_firmware_update)
+    i.register_handler('flash_firmware', flash_firmware)
+    
     asyncio.run(i.listen())
     print('Listening to ira messages')
 

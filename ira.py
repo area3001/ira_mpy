@@ -38,10 +38,10 @@ class Ira:
         asyncio.create_task(self.c.wait())
 
     async def _heartbeat_loop(self):
-        print('Start heartbeat loop')
+        print('Start ❤-beat loop')
         while True:
             await self.c.publish('area3001.ira.{}.devices.{}'.format(self.group, self.id), self._heartbeat_msg())
-            print('Sent heartbeat')
+            print('Sent ❤-beat')
             await asyncio.sleep(config.heardbeat_interval)
             
     def _heartbeat_msg(self):

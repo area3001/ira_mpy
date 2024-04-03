@@ -7,18 +7,22 @@
 wifi_ssid = "area3001"
 wifi_password  = "hackerspace"
 
-pixel_count = 5
-pinOutNumber = 2
+pixel_count = 16
+pinOutNumber = 14
 
 enable_debugging = False
 heardbeat_interval = 30 # seconden
 
-device_id = "0004"
-device_name = "2e Badge von Kris"
-device_hardware = "Badge"
-device_version = "2024.2"
+device_id = "0006"
+device_name = "ESP von Kris"
+device_hardware = "IRA"
+device_version = "2024.3"
 
 natsServer = "nats://demo.nats.io:4222"
+
+# URL of the version file and the new main.py on the server
+VERSION_URL = 'http://ira.makerspace-baasrode.be/version.txt'
+UPDATE_URL = 'http://ira.makerspace-baasrode.be/main.py'
 
 # For MAC
 # nats publish -s nats://demo.nats.io:4222 area3001.ira.default.output 'set_pixel 0 #ff0000'
@@ -34,3 +38,4 @@ natsServer = "nats://demo.nats.io:4222"
 # From this point you can listen and send messages.
 # nats-pub -s nats://demo.nats.io:4222 area3001.ira.default.output 'set_pixel 0 #ff0000'
 # nats-pub -s nats://demo.nats.io:4222 area3001.ira.default.output 'clear_pixels'
+# nats-pub -s nats://demo.nats.io:4222 area3001.ira.default.output 'flash_firmware 2024.5'
