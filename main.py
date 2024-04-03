@@ -1,3 +1,5 @@
+import time
+
 from ira import config
 import asyncio
 import network
@@ -8,6 +10,26 @@ cfg = config.Config()
 
 # nats publish -s nats://demo.nats.io:4222 area3001.ira.default.output 'set_pixel 0 #ff0000'
 
+
+def PrintWifiSatus(number):
+    # https://mpython.readthedocs.io/en/v2.2.1/library/micropython/network.html
+    cases = {
+        1000: "Wlan status: No connection, no activities",  # STAT_IDLE
+        1001: "Wlan status: Connecting",
+        202: "Wlan status: Failed due to password error",
+        201: "Wlan status: Failed, because there is no access point reply",
+        1010: "Wlan status: Connected",
+        203: "Wlan status: STAT_ASSOC_FAIL",
+        204: "Wlan status: Handshake timeout",
+        200: "Wlan status: Timeout"
+        # Add more cases as needed
+    }
+    # Get the message from the dictionary based on the number (status code)
+    # If the number is not found, return a default message
+    message = cases.get(number, "Wlan status: Unknown Status Code")
+
+    # Print the message or perform any other action needed
+    print(message)
     
 
 def main():
@@ -23,6 +45,7 @@ def main():
     print('Deviceid:', cfg.get_device_id())
     print('Device Name:', cfg.get_device_name())
     print('Hardware:', cfg.get_device_hardware())
+    print('Wifi SSID:', cfg.get_wifi_ssid(), 'Hidden:', cfg.get_wifi_hidden())
 
     ssid = cfg.get_wifi_ssid()
     if ssid is None:
@@ -39,13 +62,18 @@ def main():
             print('We are not connected to network...')
             wlan.active(False)
             wlan.active(True)
-            #sta_if.config(hidden=True) #@Hackerspace the wifi is hidden.
+
+            if cfg.get_wifi_hidden() == 1:
+                wlan.config(ssid=ssid, hidden=True)
+
             print("Connecting to router...")
             wlan.connect(ssid, cfg.get_wifi_password())
 
             #CHECK IF CONNECTED TO WLAN
             while not wlan.isconnected():
-                pass# LOOP UNTIL CONNECTED
+                s = wlan.status()
+                PrintWifiSatus(s)
+                time.sleep(2)
 
         print("Retrieving Network Configuration from: [", ssid, "].")
         print('Network config:', wlan.ifconfig())

@@ -1,7 +1,7 @@
 import asyncio
 import utime
 
-from nats_utils import _urlparse, _build_connect_config, INFO, _build_inbox, MSG, PING, OK, ERR, _get_command, PONG, \
+from ira.nats_utils import _urlparse, _build_connect_config, INFO, _build_inbox, MSG, PING, OK, ERR, _get_command, PONG, \
     NATSCommandException, NATSError
 
 

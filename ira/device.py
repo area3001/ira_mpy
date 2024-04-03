@@ -3,14 +3,15 @@ import network
 import json
 import ubinascii
 
-import nats
+from ira import net
+from ira import nats
+
 from machine import Pin
 from neopixel import NeoPixel
-import net
 
 
 class Device:
-    def __init__(self, id, name, hw_type, hw_version, group="default", url="nats://demo.nats.io"):
+    def __init__(self, id, name, hw_type, hw_version, group="default", url="nats://demo.nats.io:4222"):
         self.id = id
         self.name = name
         self.group = group

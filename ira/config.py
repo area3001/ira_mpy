@@ -37,17 +37,19 @@ class Config:
         self._nvs.set_blob('wifi_ssid', value)
 
     def get_wifi_ssid(self):
-        result = bytearray(16)
-        self._nvs.get_blob('wifi_ssid', result)
-        return result
+        return self.get_string_property('wifi_ssid', 32)
 
     def set_wifi_password(self, value):
         self._nvs.set_blob('wifi_password', value)
 
     def get_wifi_password(self):
-        result = bytearray(16)
-        self._nvs.get_blob('wifi_password', result)
-        return result
+        return self.get_string_property('wifi_password', 64)
+
+    def set_wifi_hidden(self, value):
+        self.set_int_property('wifi_hidden', value)
+
+    def get_wifi_hidden(self):
+        return self.get_int_property('wifi_hidden', 0)
 
     def set_server(self, value):
         self._nvs.set_blob('server', value)
@@ -77,7 +79,7 @@ class Config:
         try:
             result = bytearray(max_length)
             self._nvs.get_blob(key, result)
-            return result
+            return result.decode('utf-8').trim()
         except:
             return default
 
