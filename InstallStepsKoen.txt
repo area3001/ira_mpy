@@ -35,3 +35,16 @@
 ** (WIN) go install github.com/nats-io/natscli/nats@latest
 
 * nats subscribe -s nats://demo.nats.io:4222 "area3001.ira.>"
+
+
+===================================================================
+Compile steps (also ssee https://github.com/KoenBuys/micropython_ira/tree/master/ports/esp32)
+
+* git clone https://github.com/KoenBuys/micropython_ira.git
+* (WIN) Install Make: https://gnuwin32.sourceforge.net/packages/make.htm
+* Add to PATH in Start > System > Advanced System settings > Environment Variables...
+* Test in powershell with 'make -v'
+* Clone ESP-IDF V 5.2.0: git clone -b v5.2 --recursive https://github.com/espressif/esp-idf.git
+* Go in folder: cd esp-idf
+* Install ./install.sh       # (or install.bat on Windows)
+* Add to Path: source export.sh   # (or export.bat on Windows)
