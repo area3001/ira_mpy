@@ -48,3 +48,12 @@ Compile steps (also ssee https://github.com/KoenBuys/micropython_ira/tree/master
 * Go in folder: cd esp-idf
 * Install ./install.sh       # (or install.bat on Windows)
 * Add to Path: source export.sh   # (or export.bat on Windows)
+
+================== Via WSL2 =====================
+* wsl --install Ubuntu
+* wsl
+* git clone https://github.com/KoenBuys/micropython_ira.git
+* git clone -b v5.2 --recursive https://github.com/espressif/esp-idf.git
+* sudo apt-get install pip python3.10-venv cmake
+
+
