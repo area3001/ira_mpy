@@ -31,12 +31,17 @@ More info can be found in InstallStepsKoen.txt
 The idea is to divide the processing over the cores
 
 ### Core0
-- NATS
-- IR (opt)
-- OTA (opt)
+- FreeRTOS
+- WIFI handlers
 
 ### Core1
+- Micropython
+- NATS
 - Ledtape
+
+### TBD
+- IR (opt)
+- OTA (opt)
 - DMX (optionally on helper processor?)
 
 ## NATS
