@@ -30,7 +30,7 @@ class Config:
         return self.get_string_property('device_name', 32, self.get_device_id())
 
     def set_device_hardware(self, value):
-        return self.get_string_property('device_version', 32)
+        return self.set_string_property('device_hardware', value)
 
     def get_device_hardware(self):
         return self.get_string_property('device_hardware', 32, 'UNKNOWN')

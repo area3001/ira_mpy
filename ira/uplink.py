@@ -12,7 +12,7 @@ class Uplink:
     def __init__(self, cfg):
         self.cfg = cfg
         self.wlan = None
-        self.c = nats.Connection(cfg.get_server(), debug=True)
+        self.c = nats.Connection(cfg.get_server(), debug=False)
 
         self.handlers = {}
 
