@@ -30,7 +30,7 @@ class Config:
         return self.get_string_property('device_name', 32, self.get_device_id())
 
     def set_device_hardware(self, value):
-        self._nvs.get_blob('device_hardware', value)
+        return self.get_string_property('device_version', 32)
 
     def get_device_hardware(self):
         return self.get_string_property('device_hardware', 32, 'UNKNOWN')

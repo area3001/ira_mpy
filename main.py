@@ -6,6 +6,7 @@ import network
 
 from ira.device import Device
 from ira.link import link
+from ira.state import StateMachine
 from ira.uplink import Uplink
 
 cfg = config.Config()
@@ -34,12 +35,17 @@ def main():
     # load the device configuration
     dev.load()
 
-    if not upl.is_connectable():
-        print('not configured')
-    else:
-        link(upl, dev)
-        asyncio.run(upl.connect())
-        print('listening to ira messages')
+    sm = StateMachine(upl, dev)
+    asyncio.run(sm.run())
+
+    #
+    #
+    # if not upl.is_connectable():
+    #     print('not configured')
+    # else:
+    #     link(upl, dev)
+    #     asyncio.run(upl.connect())
+    #     print('listening to ira messages')
 
     asyncio.get_event_loop().run_forever()
 

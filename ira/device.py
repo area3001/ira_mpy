@@ -33,3 +33,17 @@ class Device:
             self.outputs[channel] = NeopixelOutput(cfg)
         else:
             raise ValueError('Unknown output kind: {}'.format(cfg.kind))
+
+    async def set_rgb(self, output, data):
+        if output < 0 or output >= len(self.outputs):
+            return False
+
+        await self.outputs[output].set_rgb(data)
+        return True
+
+    def set_all_rgb(self, data):
+        for output in self.outputs:
+            self.outputs[output].set_rgb(data)
+
+        return True
+
