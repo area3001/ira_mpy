@@ -19,25 +19,3 @@ cfg.set_wifi_ssid('your_ssid')
 cfg.set_wifi_password('your_password')
 cfg.persist()
 ```
-
-## Configuring Wifi
-Make sure you have uploaded the latest version
-Connect to the ESP32 and enter the following commands on the REPL
-```python
-from ira.config import Config
-cfg = Config()
-cfg.set_wifi_ssid('your_ssid')
-cfg.set_wifi_password('your_password')
-cfg.persist()
-```
-
-## Configuring Wifi
-Make sure you have uploaded the latest version
-Connect to the ESP32 and enter the following commands on the REPL
-```python
-from ira.config import Config
-cfg = Config()
-cfg.set_wifi_ssid('your_ssid')
-cfg.set_wifi_password('your_password')
-cfg.persist()
-```

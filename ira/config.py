@@ -3,6 +3,8 @@
 #  | || |_) |  / _ \
 #  | ||  _ <  / ___ \
 # |___|_| \_\/_/   \_\
+import json
+
 import machine
 from esp32 import NVS
 import ubinascii
@@ -14,6 +16,12 @@ class Config:
 
     def get_device_id(self):
         return ubinascii.hexlify(machine.unique_id()).decode('utf-8')
+
+    def get_device_group(self):
+        return self.get_string_property('device_group', 32, 'default')
+
+    def set_device_group(self, value):
+        self._nvs.set_blob('device_group', value)
 
     def set_device_name(self, value):
         self._nvs.set_blob('device_name', value)
@@ -79,9 +87,23 @@ class Config:
         try:
             result = bytearray(max_length)
             self._nvs.get_blob(key, result)
-            return result.decode('utf-8').trim()
+            return result.decode('utf-8').rstrip('\x00')
         except:
             return default
+
+    def get_json(self, key):
+        try:
+            l = self._nvs.get_i32('{}.__length'.format(key))
+            result = bytearray(l)
+            self._nvs.get_blob(key, result)
+            return json.loads(result.decode('utf-8'))
+        except:
+            return None
+
+    def set_json(self, key, value):
+        b = json.dumps(value).encode('utf-8')
+        self._nvs.set_i32('{}.__length'.format(key), len(b))
+        self._nvs.set_blob(key, b)
 
     def persist(self):
         self._nvs.commit()
