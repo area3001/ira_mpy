@@ -35,7 +35,7 @@ def main():
     # load the device configuration
     dev.load()
 
-    sm = StateMachine(upl, dev)
+    sm = StateMachine(cfg, upl, dev)
     asyncio.run(sm.run())
 
     #

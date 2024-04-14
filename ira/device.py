@@ -1,3 +1,5 @@
+import json
+
 from machine import Pin
 from neopixel import NeoPixel
 
@@ -22,17 +24,17 @@ class Device:
 
     def register_output(self, channel, config):
         # store the configuration
-        self.output_config[channel] = config
+        self.output_config[channel] = json.loads(config)
         self.save()
 
         # load the output
         self.load_output(channel, self.output_config[channel])
 
     def load_output(self, channel, cfg):
-        if cfg.kind == 'neopixel':
+        if cfg['kind'] == 'neopixel':
             self.outputs[channel] = NeopixelOutput(cfg)
         else:
-            raise ValueError('Unknown output kind: {}'.format(cfg.kind))
+            raise ValueError('Unknown output kind: {}'.format(cfg['kind']))
 
     async def set_rgb(self, output, data):
         if output < 0 or output >= len(self.outputs):

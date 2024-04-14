@@ -23,21 +23,35 @@ class NeopixelOutput(Output):
         timing = cfg.get('timing', 1)
 
         self.np = NeoPixel(Pin(pin), length, bpp=bpp, timing=timing)
+        for i in range(0, len(self.np)):
+            self.np[i] = (0, 0, 0)
+        self.np.write()
 
     def set_rgb(self, data):
+        print("setting neopixel data", data)
         pairs = data.split(' ')
-        for i in range(1, len(pairs)):
+        for i in range(0, len(pairs)):
             addr_color = pairs[i].split('#')
             if len(addr_color) != 2:
-                return False
-
-            addr = int(addr_color[0])
-            if addr >= len(self.np):
-                # address out of range
-                return False
+                print("invalid color format")
+                return {"error": "invalid color format"}
 
             color = addr_color[1]
             color = tuple(int(color[i:i + 2], 16) for i in (0, 2, 4))
-            self.np[addr] = color
+
+            if addr_color[0] == '*':
+                # set all pixels
+                for i in range(0, len(self.np)):
+                    self.np[i] = color
+
+            else:
+                addr = int(addr_color[0])
+                if addr >= len(self.np):
+                    # address out of range
+                    print("address out of range")
+                    return {"error": "address out of range"}
+
+                self.np[addr] = color
 
         self.np.write()
+        return {"success": True}

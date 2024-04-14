@@ -65,12 +65,6 @@ class Config:
     def get_server(self):
         return self.get_string_property('server', 256, 'nats://demo.nats.io:4222')
 
-    def get_facets(self):
-        return self.get_string_property('facets', 256, '')
-
-    def set_facets(self, value):
-        self._nvs.set_blob('facets', value)
-
     def set_int_property(self, key, value):
         self._nvs.set_i32(key, value)
 
@@ -93,7 +87,7 @@ class Config:
 
     def get_json(self, key):
         try:
-            l = self._nvs.get_i32('{}.__length'.format(key))
+            l = self._nvs.get_i32('{}.l'.format(key))
             result = bytearray(l)
             self._nvs.get_blob(key, result)
             return json.loads(result.decode('utf-8'))
@@ -102,7 +96,10 @@ class Config:
 
     def set_json(self, key, value):
         b = json.dumps(value).encode('utf-8')
-        self._nvs.set_i32('{}.__length'.format(key), len(b))
+        print('setting json', '{}.l'.format(key), len(b))
+        self._nvs.set_i32('{}.l'.format(key), len(b))
+
+        print('setting json', key, b)
         self._nvs.set_blob(key, b)
 
     def persist(self):

@@ -3,6 +3,8 @@ import json
 import time
 
 import network
+import sys
+
 from ira import nats
 
 
@@ -50,7 +52,6 @@ class Uplink:
             self._parse_message)
         await self.c.subscribe('area3001.ira.{}.output.>'.format(self.cfg.get_device_group()), self._parse_message)
 
-        asyncio.create_task(self._heartbeat_loop())
         asyncio.create_task(self.c.wait())
 
     async def close(self):
@@ -58,30 +59,23 @@ class Uplink:
 
     def register_handler(self, command, cb):
         self.handlers[command] = cb
+        print('registered handler for', command)
 
     async def _parse_message(self, msg):
         try:
-            out_cmd = msg.subject.split('.')[-2:]
+            out_cmd = msg.subject.decode("utf-8").split('.')[-2:]
 
             if out_cmd[1] in self.handlers:
-                res = await self.handlers[out_cmd[1]](out_cmd[0], msg.data)
+                res = self.handlers[out_cmd[1]](out_cmd[0], msg.data)
                 if msg.reply is not None and res is not None:
-                    await self.c.publish(msg.reply, res)
+                    await self.c.publish(msg.reply.decode('utf-8'), json.dumps(res))
             else:
                 raise ValueError('Unknown command %s' % out_cmd[1])
 
         except Exception as t:
+            # raise t
             print('Failed to process message \"%s\": %s' % (msg.data, t))
-
-    async def _heartbeat_loop(self):
-        while True:
-            await self.c.publish('area3001.ira.{}.devices.{}'.format(self.cfg.get_device_group(), self.cfg.get_device_id()), self._heartbeat_msg())
-            await asyncio.sleep(10)
-
-    def _heartbeat_msg(self):
-        return json.dumps({
-            'id': self.cfg.get_device_id(),
-        })
+            sys.print_exception(t)
 
 
 def print_wifi_status(number):

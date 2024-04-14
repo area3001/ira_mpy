@@ -1,13 +1,19 @@
 import asyncio
 
+import gc
+
+from ira.beater import Beater
+from ira.link import link
+
 
 class State:
-    def run(self, upl, dev):
+    def run(self, cfg, upl, dev):
         raise NotImplementedError()
 
 
 class StateMachine:
-    def __init__(self, upl, dev):
+    def __init__(self, cfg, upl, dev):
+        self._cfg = cfg
         self._upl = upl
         self._dev = dev
         self.states = {
@@ -25,16 +31,16 @@ class StateMachine:
 
     async def run(self):
         while True:
-            nxt = await self.current_state.run(self._upl, self._dev)
+            gc.collect()
+            nxt = await self.current_state.run(self._cfg, self._upl, self._dev)
             self.set_state(nxt)
-            await asyncio.sleep(5)
 
 
 class UnconfiguredState(State):
     def __init__(self):
         pass
 
-    async def run(self, upl, dev):
+    async def run(self, cfg, upl, dev):
         print("waiting to be configured", end="")
 
         while True:
@@ -43,13 +49,14 @@ class UnconfiguredState(State):
                 print("") # make sure the newline is printed for further output to work
                 return 'offline'
             await asyncio.sleep(5)
+            gc.collect()
 
 
 class OfflineState(State):
     def __init__(self):
         pass
 
-    async def run(self, upl, dev):
+    async def run(self, cfg, upl, dev):
         # -- check if the device is connectable
         if not upl.is_connectable():
             # -- set the state to offline
@@ -68,9 +75,19 @@ class ConnectedState(State):
     def __init__(self):
         pass
 
-    async def run(self, upl, dev):
-        while True:
-            if not upl.is_connected():
-                return 'offline'
+    async def run(self, cfg, upl, dev):
+        link(upl, dev)
 
-            await asyncio.sleep(5)
+        beater = Beater(cfg, upl, dev)
+        bh = asyncio.create_task(beater.run())
+
+        try:
+            while True:
+                if not upl.is_connected():
+                    break
+
+                await asyncio.sleep(5)
+                gc.collect()
+        finally:
+            bh.cancel()
+            return "offline"
