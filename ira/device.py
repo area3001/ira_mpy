@@ -3,6 +3,7 @@ import json
 from machine import Pin
 from neopixel import NeoPixel
 
+from ira.fx import FxEngine
 from ira.output import NeopixelOutput
 
 
@@ -11,6 +12,8 @@ class Device:
         self._cfg = cfg
         self.outputs = {}
         self.output_config = {}
+
+        self.fx = FxEngine(self)
 
     def load(self):
         self.output_config = self._cfg.get_json('outputs') or {}
