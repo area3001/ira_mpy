@@ -70,3 +70,19 @@ There are a few extra settings to be provided in case your pixels need it:
 ```
 - `bpp` is the number of bits per pixel, this is usually 4 for RGBW leds and 3 for RGB leds with 3 being the default value
 - `timing` is the timing to use, this is usually 1 for WS2812 leds and 0 for SK6812 leds with 1 being the default value
+
+## Operating the outputs
+### Setting the color of a neopixel
+```commandline
+nats req "area3001.ira.daan.devices.240ac4471ed0.output.1.rgb" "0#000033 1#003300 2#330000"
+```
+
+In case you want to set all pixels to a color, you can use `*` as the pixel number:
+```commandline
+nats req "area3001.ira.daan.devices.240ac4471ed0.output.1.rgb" "*#000033"
+```
+
+### Clearing the pixels
+```commandline
+nats req "area3001.ira.daan.devices.240ac4471ed0.output.1.rgb" "*#000000"
+```
