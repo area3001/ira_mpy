@@ -1,51 +1,47 @@
 # Originally from pyb_dmx from clacktronics (https://github.com/clacktronics/pyb_dmx/)
 #
 # Needs to be rewritten to asyncio
-
-from machine import UART, Pin
+import asyncio
 from array import array
 from time import sleep_us
 
-tx_pins = [None, 'X9', 'X3', 'Y9', 'X1', None, 'Y1']
+from machine import UART
 
-class universe():
+
+class Universe():
     def __init__(self, port):
-        self.port = port
-
-        # To check if port is valid
-        dmx_uart = UART(port)
-        del(dmx_uart)
+        self.dmx_uart = UART(port)
+        self.dmx_uart.init(250000, bits=8, parity=None, stop=2)
 
         # First byte is always 0, 512 after that is the 512 channels
         self.dmx_message = array('B', [0] * 513)
+
+    def set_data(self, data):
+        if len(data) > 512:
+            data = data[:512]
+
+        self.dmx_message[1:len(data)] = data
 
     def set_channels(self, message):
         """
         a dict and writes them to the array
         format {channel:value}
         """
-
         for ch in message:
             self.dmx_message[ch] = message[ch]
 
-        # for i, ch in enumerate(channels):
-        #     self.dmx_message[ch] = values[i]
+    def attach(self):
+        asyncio.create_task(self._loop())
 
-    def write_frame(self):
-        """
-        Send a DMX frame
-        """
-        # DMX needs a 88us low to begin a frame,
-        # 77uS us used because of time it takes to init pin
-        dmx_uart = Pin(tx_pins[self.port], Pin.OUT_PP)
-        dmx_uart.value(0)
-        sleep_us(74)
-        dmx_uart.value(1)
+    async def _loop(self):
+        if self.dmx_uart.txdone():
+            self.dmx_uart.sendbreak()
 
-        # Now turn into a UART port and send DMX data
-        dmx_uart = UART(self.port)
-        dmx_uart.init(250000, bits=8, parity=None, stop=2)
-        #send bytes
-        dmx_uart.write(self.dmx_message)
-        #Delete as its going to change anyway
-        del(dmx_uart)
+            while not self.dmx_uart.txdone():
+                sleep_us(100)
+
+            self.dmx_uart.write(self.dmx_message)
+
+            await asyncio.sleep_ms(22)
+        else:
+            await asyncio.sleep_ms(1)
