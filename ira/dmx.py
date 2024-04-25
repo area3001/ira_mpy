@@ -5,12 +5,12 @@ import asyncio
 from array import array
 from time import sleep_us
 
-from machine import UART
+from machine import UART, Pin
 
 
 class Universe():
     def __init__(self, port):
-        self.dmx_uart = UART(port)
+        self.dmx_uart = UART(port, rx=23, tx=13, rts=18, cts=19)
         self.dmx_uart.init(250000, bits=8, parity=None, stop=2)
 
         # First byte is always 0, 512 after that is the 512 channels
@@ -34,14 +34,15 @@ class Universe():
         asyncio.create_task(self._loop())
 
     async def _loop(self):
-        if self.dmx_uart.txdone():
-            self.dmx_uart.sendbreak()
+        while True:
+            if self.dmx_uart.txdone():
+                self.dmx_uart.sendbreak()
 
-            while not self.dmx_uart.txdone():
-                sleep_us(100)
+                while not self.dmx_uart.txdone():
+                    sleep_us(100)
 
-            self.dmx_uart.write(self.dmx_message)
+                self.dmx_uart.write(self.dmx_message)
 
-            await asyncio.sleep_ms(22)
-        else:
-            await asyncio.sleep_ms(1)
+                await asyncio.sleep_ms(22)
+            else:
+                await asyncio.sleep_ms(1)
