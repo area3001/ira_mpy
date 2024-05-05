@@ -1,7 +1,7 @@
 import asyncio
 import utime
 
-from nats_utils import _urlparse, _build_connect_config, INFO, _build_inbox, MSG, PING, OK, ERR, _get_command, PONG, \
+from ira.nats_utils import _urlparse, _build_connect_config, INFO, _build_inbox, MSG, PING, OK, ERR, _get_command, PONG, \
     NATSCommandException, NATSError
 
 
@@ -31,7 +31,6 @@ class Subscription(object):
 
 
 DEFAULT_URI = 'nats://192.168.1.3:4222'
-
 
 
 class Connection(object):
