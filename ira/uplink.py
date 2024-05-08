@@ -6,8 +6,9 @@ import network
 import sys
 
 from ira import nats
-
-
+##
+# @file Uplink.py contains the class that handles the interactions with the NATS server
+##
 class Uplink:
     def __init__(self, cfg):
         self.cfg = cfg

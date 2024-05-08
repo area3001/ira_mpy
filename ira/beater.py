@@ -1,7 +1,8 @@
 import asyncio
 import gc
 import json
-
+import ntptime
+import time
 
 class Beater:
     def __init__(self, cfg, upl, dev):
@@ -20,6 +21,9 @@ class Beater:
             self._heartbeat_msg())
 
     def _heartbeat_msg(self):
+        ntptime.host = 'be.pool.ntp.org'
+        ntptime.settime()
+
         return json.dumps({
             'name': self._cfg.get_device_name(),
             'hardware': self._cfg.get_device_hardware(),
@@ -27,4 +31,5 @@ class Beater:
             'handlers': [k for k in self._upl.handlers.keys()],
             'mem_free': gc.mem_free(),
             'mem_alloc': gc.mem_alloc(),
+            'time': time.localtime(),
         })

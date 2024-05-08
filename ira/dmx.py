@@ -1,12 +1,12 @@
 # Originally from pyb_dmx from clacktronics (https://github.com/clacktronics/pyb_dmx/)
-#
-# Needs to be rewritten to asyncio
+# Rewritten to asyncio
+# @TODO: still needs a patch in micropython for a bigger default messsage buffer of at least 513 bytes
+
 import asyncio
 from array import array
 from time import sleep_us
 
 from machine import UART, Pin
-
 
 class Universe():
     def __init__(self, port):

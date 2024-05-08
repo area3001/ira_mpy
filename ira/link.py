@@ -1,6 +1,5 @@
 import json
 
-
 def link(upl, dev):
     upl.register_handler('rgb', lambda channel, data: set_rgb(upl, dev, channel, data))
     upl.register_handler('configure', lambda channel, data: configure(upl, dev, channel, data))
@@ -11,21 +10,17 @@ def link(upl, dev):
     upl.register_handler('fx_list', lambda channel, data: list_fx(upl, dev, channel, data))
     upl.register_handler('fx_load', lambda channel, data: load_fx(upl, dev, channel, data))
 
-
 def config(upl, dev, channel):
     return dev.output_config[str(channel)]
 
-
 def configure(upl, dev, channel, data):
     dev.register_output(str(channel), data)
-
 
 def set_rgb(upl, dev, channel, data):
     if str(channel) in dev.outputs:
         return dev.outputs[str(channel)].set_rgb(data)
 
     return {'error': 'channel not found'}
-
 
 def list_fx(upl, dev, channel, data):
     return dev.fx.list()

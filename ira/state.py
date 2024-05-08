@@ -5,11 +5,9 @@ import gc
 from ira.beater import Beater
 from ira.link import link
 
-
 class State:
     def run(self, cfg, upl, dev):
         raise NotImplementedError()
-
 
 class StateMachine:
     def __init__(self, cfg, upl, dev):
