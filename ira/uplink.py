@@ -14,6 +14,7 @@ class Uplink:
         self.wlan = None
         self.c = nats.Connection(cfg.get_server(), debug=False)
 
+        self.endpoints = {}
         self.handlers = {}
 
     def is_connectable(self):
@@ -48,29 +49,38 @@ class Uplink:
         print('Network config:', self.wlan.ifconfig())
         await self.c.connect()
         await self.c.subscribe(
-            'area3001.ira.{}.devices.{}.output.>'.format(self.cfg.get_device_group(), self.cfg.get_device_id()),
+            'area3001.ira.{}.devices.{}.>'.format(self.cfg.get_device_group(), self.cfg.get_device_id()),
             self._parse_message)
-        await self.c.subscribe('area3001.ira.{}.output.>'.format(self.cfg.get_device_group()), self._parse_message)
+        await self.c.subscribe(
+            'area3001.ira.{}.devices.all.>'.format(self.cfg.get_device_group()),
+            self._parse_message)
 
         asyncio.create_task(self.c.wait())
 
     async def close(self):
         await self.c.close()
 
-    def register_handler(self, command, cb):
-        self.handlers[command] = cb
-        print('registered handler for', command)
+    def register_handler(self, subject, cb):
+        self.handlers[subject] = cb
+        print('registered handler for', subject)
 
     async def _parse_message(self, msg):
+        """
+        Parse message from group subject and call the appropriate handler.
+        area3001.ira.{}.devices.all.>
+        """
         try:
-            out_cmd = msg.subject.decode("utf-8").split('.')[-2:]
+            sub = msg.subject.decode("utf-8").split('.')
 
-            if out_cmd[1] in self.handlers:
-                res = self.handlers[out_cmd[1]](out_cmd[0], msg.data)
+            # Get the last parts of the subject, which will denote the actual operation we want to perform
+            handler_id = ".".join(sub[5:])
+
+            if handler_id in self.handlers:
+                res = self.handlers[handler_id](msg.data)
                 if msg.reply is not None and res is not None:
                     await self.c.publish(msg.reply.decode('utf-8'), json.dumps(res))
             else:
-                raise ValueError('Unknown command %s' % out_cmd[1])
+                raise ValueError('Unknown command %s' % handler_id)
 
         except Exception as t:
             # raise t

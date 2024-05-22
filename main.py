@@ -1,11 +1,7 @@
-import time
+import asyncio
 
 from ira import config
-import asyncio
-import network
-
 from ira.device import Device
-from ira.link import link
 from ira.state import StateMachine
 from ira.uplink import Uplink
 

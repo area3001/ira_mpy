@@ -1,106 +1,138 @@
-import asyncio
-import sys
+import json
 
-from machine import Pin
-from neopixel import NeoPixel
+
+def link_output(upl, dev):
+    upl.register_handler('output.rgb', lambda data: set_rgb(upl, dev, data))
+    upl.register_handler('output.dmx', lambda data: patch_dmx(upl, dev, data))
+    upl.register_handler('output.dmx_raw', lambda data: set_dmx(upl, dev, data))
+    upl.register_handler('output.configure', lambda data: configure(upl, dev, data))
+    upl.register_handler('output.config', lambda data: config(upl, dev, data))
+
+
+def config(upl, dev, data):
+    """
+    Print the configuration of the output channels
+    """
+    return dev.output_config
+
+
+def configure(upl, dev, data):
+    if not data or len(data) == 0:
+        return
+
+    payload = json.loads(data)
+    if 'channel' not in payload:
+        raise ValueError('channel is required')
+
+    if 'config' not in payload:
+        raise ValueError('config is required')
+
+    channel = payload['channel']
+    settings = payload['config']
+
+    dev.register_output(channel, settings)
+
+
+def set_rgb(upl, dev, data):
+    affected_channels = set([])
+
+    pairs = data.split(' ')
+    for i in range(0, len(pairs)):
+        particles = pairs[i].split('#')
+        if len(particles) != 3:
+            print("invalid particles format")
+            return {"error": "invalid particles format"}
+
+        # particle 3 is the color
+        color = particles[2]
+        color = tuple(int(color[i:i + 2], 16) for i in (0, 2, 4))
+
+        channel = particles[0]
+        addr = particles[1]
+        if channel == '*':
+            # -- iterate all channels
+            affected_channels = dev.outputs.keys()
+            for channel in affected_channels:
+                if addr == '*':
+                    # set all pixels to the same color
+                    for i in range(0, dev.outputs[channel].rgb_length()):
+                        dev.outputs[channel].rgb_set(i, color)
+                else:
+                    a = int(addr)
+                    if 0 <= a < dev.outputs[channel].rgb_length():
+                        # set a specific pixel to the color
+                        dev.outputs[channel].rgb_set(a, color)
+
+        else:
+
+            affected_channels.add(channel)
+
+            if addr == '*':
+                # set all pixels
+                for i in range(0, dev.outputs[channel].rgb_length()):
+                    dev.outputs[channel].rgb_set(i, color)
+            else:
+                a = int(addr)
+                if 0 <= a < dev.outputs[channel].rgb_length():
+                    # set a specific pixel to the color
+                    dev.outputs[channel].rgb_set(a, color)
+
+    # flush the changes to the output
+    for channel in affected_channels:
+        dev.outputs[channel].rgb_write()
+
+    return {"success": True}
+
+
+def set_dmx(upl, dev, data):
+    # check if a dmx output is available
+    if 'dmx' not in dev.outputs:
+        raise ValueError('No DMX output available')
+
+    dev.outputs['dmx'].set_dmx(data)
+
+
+def patch_dmx(upl, dev, data):
+    # check if a dmx output is available
+    if 'dmx' not in dev.outputs:
+        raise ValueError('No DMX output available')
+
+    dev.outputs['dmx'].patch_dmx(data)
 
 
 class Output:
     def set_rgb(self, data):
-        raise NotImplementedError
+        pass
 
     def rgb_set(self, pixel, color_tuple):
-        raise NotImplementedError
+        pass
 
     def rgb_write(self):
-        raise NotImplementedError
+        pass
 
     def rgb_length(self):
-        raise NotImplementedError
+        pass
+
+    def set_dmx(self, data):
+        """
+        Set the DMX data and send it.
+
+        The provided data needs to be exactly 512 bytes long. If longer, the data will be truncated.
+        """
+        pass
+
+    def patch_dmx(self, data):
+        """
+        Path the dmx data and send it.
+
+        The provided data needs to be a dict using the following format:
+        `{channel:value}`
+
+        The channel is the DMX channel to be patched and the value is the value to be set.
+        """
+        pass
 
     def close(self):
         pass
 
 
-class NeopixelOutput(Output):
-    def __init__(self, cfg):
-        if 'pin' not in cfg:
-            raise ValueError('pin is required')
-        if 'length' not in cfg:
-            raise ValueError('length is required')
-
-        pin = cfg['pin']
-        length = cfg['length']
-        bpp = cfg.get('bpp', 3)
-        timing = cfg.get('timing', 1)
-
-        self.np = NeoPixel(Pin(pin), length, bpp=bpp, timing=timing)
-        for i in range(0, len(self.np)):
-            self.np[i] = (0, 0, 0)
-        self.np.write()
-
-        self._fx = None
-
-    def run_fx(self, data):
-        name = data['name']
-
-        if self._fx:
-            self._fx.cancel()
-
-        self._fx = asyncio.create_task(self._run_effect(name, data))
-
-    def stop(self):
-        if self._fx:
-            self._fx.cancel()
-            self._fx = None
-
-        for i in range(0, len(self.np)):
-            self.np[i] = (0, 0, 0)
-        self.np.write()
-
-
-    async def _run_effect(self, name, data):
-        try:
-            exec('import fx.' + name, {})
-            await sys.modules['fx.' + name].run(self, data)
-        except Exception as e:
-            print(e)
-            sys.print_exception(e)
-
-    def rgb_length(self):
-        return len(self.np)
-
-    def rgb_set(self, pixel, color_tuple):
-        self.np[pixel] = color_tuple
-
-    def rgb_write(self):
-        self.np.write()
-
-    def set_rgb(self, data):
-        print("setting neopixel data", data)
-        pairs = data.split(' ')
-        for i in range(0, len(pairs)):
-            addr_color = pairs[i].split('#')
-            if len(addr_color) != 2:
-                print("invalid color format")
-                return {"error": "invalid color format"}
-
-            color = addr_color[1]
-            color = tuple(int(color[i:i + 2], 16) for i in (0, 2, 4))
-
-            if addr_color[0] == '*':
-                # set all pixels
-                for i in range(0, len(self.np)):
-                    self.rgb_set(i, color)
-
-            else:
-                addr = int(addr_color[0])
-                if addr >= len(self.np):
-                    # address out of range
-                    print("address out of range")
-                    return {"error": "address out of range"}
-
-                self.rgb_set(addr, color)
-
-        self.rgb_write()
-        return {"success": True}

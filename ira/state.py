@@ -1,9 +1,9 @@
 import asyncio
-
 import gc
 
 from ira.beater import Beater
-from ira.link import link
+from ira.fx import link_fx
+from ira.output import link_output
 
 
 class State:
@@ -76,7 +76,8 @@ class ConnectedState(State):
         pass
 
     async def run(self, cfg, upl, dev):
-        link(upl, dev)
+        link_output(upl, dev)
+        link_fx(upl, dev)
 
         beater = Beater(cfg, upl, dev)
         bh = asyncio.create_task(beater.run())

@@ -16,6 +16,9 @@ class Universe():
         # First byte is always 0, 512 after that is the 512 channels
         self.dmx_message = array('B', [0] * 513)
 
+    def close(self):
+        self.dmx_uart.deinit()
+
     def set_data(self, data):
         if len(data) > 512:
             data = data[:512]
@@ -28,7 +31,7 @@ class Universe():
         format {channel:value}
         """
         for ch in message:
-            self.dmx_message[ch] = message[ch]
+            self.dmx_message[int(ch)] = message[ch]
 
     def attach(self):
         asyncio.create_task(self._loop())

@@ -10,6 +10,23 @@ from esp32 import NVS
 import ubinascii
 
 
+def link_config(upl, dev):
+    cfg = Config()
+
+    upl.register_handler('config.get', lambda data: get_config(cfg, data))
+    upl.register_handler('config.set', lambda data: set_config(cfg, data))
+
+    dev._cfg = cfg
+
+
+def get_config(cfg, data):
+    pass
+
+
+def set_config(cfg, data):
+    pass
+
+
 class Config:
     def __init__(self):
         self._nvs = NVS('config')

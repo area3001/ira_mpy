@@ -3,8 +3,9 @@ import json
 from machine import Pin
 from neopixel import NeoPixel
 
+from ira import output_dmx
+from ira import output_neopixel
 from ira.fx import FxEngine
-from ira.output import NeopixelOutput
 
 
 class Device:
@@ -27,15 +28,24 @@ class Device:
 
     def register_output(self, channel, config):
         # store the configuration
-        self.output_config[channel] = json.loads(config)
+        self.output_config[channel] = config
         self.save()
 
         # load the output
         self.load_output(channel, self.output_config[channel])
 
     def load_output(self, channel, cfg):
+        if channel in self.outputs:
+            self.outputs[channel].close()
+            self.outputs[channel] = None
+
+        if 'kind' not in cfg:
+            raise ValueError('kind is required')
+
         if cfg['kind'] == 'neopixel':
-            self.outputs[channel] = NeopixelOutput(cfg)
+            self.outputs[channel] = output_neopixel.NeopixelOutput(cfg)
+        elif cfg['kind'] == 'dmx':
+            self.outputs[channel] = output_dmx.DmxOutput(cfg)
         else:
             raise ValueError('Unknown output kind: {}'.format(cfg['kind']))
 
