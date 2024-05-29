@@ -44,7 +44,7 @@ class Uplink:
         while not self.wlan.isconnected():
             s = self.wlan.status()
             print_wifi_status(s)
-            time.sleep(2)
+            await asyncio.sleep(1)
 
         print('Network config:', self.wlan.ifconfig())
         await self.c.connect()

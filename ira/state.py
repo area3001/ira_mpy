@@ -7,7 +7,7 @@ from ira.output import link_output
 
 
 class State:
-    def run(self, cfg, upl, dev):
+    def run(self):
         raise NotImplementedError()
 
 
@@ -17,78 +17,87 @@ class StateMachine:
         self._upl = upl
         self._dev = dev
         self.states = {
-            'unconfigured': UnconfiguredState(),
-            'offline': OfflineState(),
-            'connected': ConnectedState()
+            'unconfigured': UnconfiguredState(self),
+            'offline': OfflineState(self),
+            'connected': ConnectedState(self)
         }
+
         self.current_state = None
+        #self.set_state('unconfigured')
 
-        self.set_state('unconfigured')
+    @property
+    def config(self):
+        return self._cfg
 
-    def set_state(self, state):
+    @property
+    def uplink(self):
+        return self._upl
+
+    @property
+    def device(self):
+        return self._dev
+
+    async def set_state(self, state):
         print('transitioning to:', state)
+        asyncio.get_event_loop().stop()
+        asyncio.new_event_loop()
+
         self.current_state = self.states[state]
+        asyncio.run(self.current_state)
 
     async def run(self):
         while True:
-            gc.collect()
-            nxt = await self.current_state.run(self._cfg, self._upl, self._dev)
-            self.set_state(nxt)
+            await self.current_state.run(self)
 
 
 class UnconfiguredState(State):
-    def __init__(self):
-        pass
+    def __init__(self, sm):
+        self.sm = sm
 
-    async def run(self, cfg, upl, dev):
+    async def run(self):
         print("waiting to be configured", end="")
-
         while True:
-            print(". ", end="")
-            if upl.is_connectable():
-                print("") # make sure the newline is printed for further output to work
-                return 'offline'
-            await asyncio.sleep(5)
-            gc.collect()
+            if self.sm.uplink.is_connectable():
+                break
+
+            await asyncio.sleep(1)
+
+        self.sm.set_state('offline')
 
 
 class OfflineState(State):
-    def __init__(self):
-        pass
+    def __init__(self, sm):
+        self.sm = sm
 
-    async def run(self, cfg, upl, dev):
-        # -- check if the device is connectable
-        if not upl.is_connectable():
-            # -- set the state to offline
-            return 'unconfigured'
-
-        # -- connect the device
+    async def run(self):
+        print("connecting to the network and to nats", end="")
         try:
-            await upl.connect()
-            return 'connected'
+            while True:
+                await self.sm.uplink.connect()
+                self.sm.set_state('connected')
+
         except Exception as e:
             print('Error connecting:', e)
-            return 'offline'
+            self.sm.set_state('offline')
 
 
 class ConnectedState(State):
-    def __init__(self):
-        pass
+    def __init__(self, sm):
+        self.sm = sm
 
-    async def run(self, cfg, upl, dev):
-        link_output(upl, dev)
-        link_fx(upl, dev)
+    async def run(self):
+        link_output(self.sm.uplink, self.sm.device)
+        link_fx(self.sm.uplink, self.sm.device)
 
-        beater = Beater(cfg, upl, dev)
-        bh = asyncio.create_task(beater.run())
+        #beater = Beater(self.sm.config, self.sm.uplink, self.sm.device)
+        #asyncio.create_task(beater.run())
 
         try:
             while True:
-                if not upl.is_connected():
+                if not self.sm.uplink.is_connected():
                     break
 
                 await asyncio.sleep(5)
                 gc.collect()
         finally:
-            bh.cancel()
-            return "offline"
+            self.sm.set_state('offline')

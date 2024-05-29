@@ -43,6 +43,7 @@ class Device:
             raise ValueError('kind is required')
 
         if cfg['kind'] == 'neopixel':
+            print(f'loading neopixel channel {channel}', cfg)
             self.outputs[channel] = output_neopixel.NeopixelOutput(cfg)
         elif cfg['kind'] == 'dmx':
             self.outputs[channel] = output_dmx.DmxOutput(cfg)
