@@ -47,6 +47,9 @@ class Device:
             self.outputs[channel] = output_neopixel.NeopixelOutput(cfg)
         elif cfg['kind'] == 'dmx':
             self.outputs[channel] = output_dmx.DmxOutput(cfg)
+        elif cfg['kind'] == 'none':
+            if channel in self.outputs:
+                del self.outputs[channel]
         else:
             raise ValueError('Unknown output kind: {}'.format(cfg['kind']))
 

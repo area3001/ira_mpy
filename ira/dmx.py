@@ -15,6 +15,7 @@ class Universe():
 
         # First byte is always 0, 512 after that is the 512 channels
         self.dmx_message = array('B', [0] * 513)
+        self.dirty = False
 
     def close(self):
         self.dmx_uart.deinit()
@@ -24,6 +25,7 @@ class Universe():
             data = data[:512]
 
         self.dmx_message[1:len(data)] = data
+        self.dirty = True
 
     def set_channels(self, message):
         """
@@ -33,19 +35,26 @@ class Universe():
         for ch in message:
             self.dmx_message[int(ch)] = message[ch]
 
+        self.dirty = True
+
+    async def write(self):
+        self.dmx_uart.sendbreak()
+
+        while not self.dmx_uart.txdone():
+            sleep_us(100)
+
+        self.dmx_uart.write(self.dmx_message)
+        self.dirty = False
+
+        # await asyncio.sleep_ms(22)
+        await asyncio.sleep_ms(22)
+
     def attach(self):
         asyncio.create_task(self._loop())
 
     async def _loop(self):
         while True:
             if self.dmx_uart.txdone():
-                self.dmx_uart.sendbreak()
-
-                while not self.dmx_uart.txdone():
-                    sleep_us(100)
-
-                self.dmx_uart.write(self.dmx_message)
-
-                await asyncio.sleep_ms(22)
+                await self.write()
             else:
                 await asyncio.sleep_ms(1)

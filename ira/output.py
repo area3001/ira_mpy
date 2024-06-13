@@ -32,6 +32,8 @@ def configure(upl, dev, data):
 
     dev.register_output(channel, settings)
 
+    return {"success": True}
+
 
 def set_rgb(upl, dev, data):
     affected_channels = set([])
@@ -45,7 +47,8 @@ def set_rgb(upl, dev, data):
 
         # particle 3 is the color
         color = particles[2]
-        color = tuple(int(color[i:i + 2], 16) for i in (0, 2, 4))
+
+        color = tuple(int(color[i:i + 2], 16) for i in range(0, len(color), 2))
 
         channel = particles[0]
         addr = particles[1]
