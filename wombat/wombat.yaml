@@ -1,0 +1,14 @@
+input:
+  generate:
+    - mapping: |-
+        root.device = "c82b968b1760"
+        root.group = "testbak"
+        root.output = "dmx"
+        root.length = 6
+        
+  processors:
+    - mapping: |
+        root = this
+        root.subject = "area3001.ira.%s.devices.%s.output.rgb".format(this.group, this.device)
+        
+        root.data =

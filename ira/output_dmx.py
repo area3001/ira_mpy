@@ -16,6 +16,12 @@ class DmxOutput(Output):
         self.universe = dmx.Universe(port)
         self.universe.attach()
 
+        self.buffer = {}
+
+    def close(self):
+        print("Closing DMX output")
+        self.universe.close()
+
     def set_dmx(self, data):
         pl = json.loads(data)
         self.universe.set_data(pl)
@@ -25,20 +31,17 @@ class DmxOutput(Output):
         pl = json.loads(data)
         self.universe.set_channels(pl)
 
-    def close(self):
-        self.universe.close()
-
     def rgb_length(self):
         return self.length
 
     def rgb_set(self, pixel, color_tuple):
-        channels = {}
-        for i in range(0, len(color_tuple)):
-            channels[str(i * pixel)] = color_tuple[i]
+        offset = (pixel * self.bpp) + 1
 
-        self.universe.set_channels(channels)
+        for i in range(0, len(color_tuple)):
+            self.buffer[str(offset + i)] = color_tuple[i]
 
     def rgb_write(self):
-        pass
+        self.universe.set_channels(self.buffer)
+        self.buffer = {}
 
 
