@@ -10,7 +10,9 @@ input:
   processors:
     - mapping: |
         meta subject = "area3001.ira.%s.devices.%s.output.dmx".format(this.group, this.device)
-        let data = range(0, this.length).map_each(i -> i.apply("map_pixel")).squash()
+        
+        let data = random_int(seed:timestamp_unix_nano(), max:6).apply("map_pixel")
+        
         root = $data.format_json(no_indent:true)
         
         map map_pixel {
@@ -20,7 +22,7 @@ input:
                 ($offset + 1).string(): random_int(seed:timestamp_unix_nano(), max:255),
                 ($offset + 2).string(): random_int(seed:timestamp_unix_nano(), max:255),
                 ($offset + 3).string(): random_int(seed:timestamp_unix_nano(), max:255),
-                ($offset + 4).string(): random_int(seed:timestamp_unix_nano(), max:255),
+                ($offset + 4).string(): random_int(seed:timestamp_unix_nano(), max:0),
             }
         }
 
