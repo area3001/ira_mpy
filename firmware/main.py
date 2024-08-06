@@ -1,10 +1,8 @@
 import asyncio
 
-import ira
-from ira import config
+from ira import config, system
 from ira.beater import Beater
 from ira.device import Device
-from ira.state import StateMachine
 from ira.uplink import Uplink
 from ira import output, fx
 
@@ -30,22 +28,16 @@ def main():
     #asyncio.get_event_loop().run_forever()
 
 async def run():
-    print("""
-     ___ ____      _
-    |_ _|  _ \    / \
-     | || |_) |  / _ \
-     | ||  _ <  / ___ \
-    |___|_| \_\/_/   \_\
+    version = open('version', 'r').read().strip()
 
-    """)
-    print('Boot up IRA version: {}'.format(cfg.get_device_version()))
-    print('Deviceid:', cfg.get_device_id())
+    print('    IRA version {}'.format(version))
+    print('Subject: area3001.ira.{}.devices.{}'.format(cfg.get_device_group(), cfg.get_device_id()))
     print('Device Name:', cfg.get_device_name())
     print('Hardware:', cfg.get_device_hardware())
     print('Wifi SSID:', cfg.get_wifi_ssid(), 'Hidden:', cfg.get_wifi_hidden())
 
     upl = Uplink(cfg)
-    dev = Device(cfg)
+    dev = Device(cfg, version)
 
     # load the device configuration
     dev.load()
@@ -56,8 +48,10 @@ async def run():
         print(".", end="")
         await asyncio.sleep(1)
 
+    print("")
+
     # when it is connectable, connect to the network
-    print("connecting to the network and to nats", end="")
+    print("connecting to the network and to nats")
     while not upl.is_connected():
         try:
             await upl.connect()
@@ -66,6 +60,7 @@ async def run():
 
     output.link_output(upl, dev)
     fx.link_fx(upl, dev)
+    system.link_system(upl, dev)
 
     beater = Beater(cfg, upl, dev)
     asyncio.create_task(beater.run())

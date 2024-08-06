@@ -89,18 +89,18 @@ def set_rgb(upl, dev, data):
 
 def set_dmx(upl, dev, data):
     # check if a dmx output is available
-    if 'dmx' not in dev.outputs:
+    if 'dout' not in dev.outputs:
         raise ValueError('No DMX output available')
 
-    dev.outputs['dmx'].set_dmx(data)
+    dev.outputs['dout'].set_dmx(data)
 
 
 def patch_dmx(upl, dev, data):
     # check if a dmx output is available
-    if 'dmx' not in dev.outputs:
+    if 'dout' not in dev.outputs:
         raise ValueError('No DMX output available')
 
-    dev.outputs['dmx'].patch_dmx(data)
+    dev.outputs['dout'].patch_dmx(data)
 
 
 class Output:

@@ -1,12 +1,12 @@
 import asyncio
 import json
-import time
 
 import network
+import machine
 import sys
 
 from ira import nats
-
+import uota
 
 class Uplink:
     def __init__(self, cfg):
@@ -47,6 +47,13 @@ class Uplink:
             await asyncio.sleep(1)
 
         print('Network config:', self.wlan.ifconfig())
+
+        if uota.check_for_updates():
+            uota.install_new_firmware()
+            machine.reset()
+        else:
+            print("No updates available")
+
         await self.c.connect()
         await self.c.subscribe(
             'area3001.ira.{}.devices.{}.>'.format(self.cfg.get_device_group(), self.cfg.get_device_id()),

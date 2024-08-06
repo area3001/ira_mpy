@@ -31,7 +31,7 @@ def run_fx(upl, dev, data):
     if _fx:
         _fx.cancel()
 
-    _fx = asyncio.create_task(_run_effect(name, data))
+    _fx = asyncio.create_task(_run_effect(dev, name, data))
 
 
 def stop_fx(upl, dev, data):
@@ -42,10 +42,10 @@ def stop_fx(upl, dev, data):
         _fx = None
 
 
-async def _run_effect(name, data):
+async def _run_effect(dev, name, data):
     try:
         exec('import fx.' + name, {})
-        await sys.modules['fx.' + name].run(self, data)
+        await sys.modules['fx.' + name].run(dev, data)
     except Exception as e:
         print(e)
         sys.print_exception(e)

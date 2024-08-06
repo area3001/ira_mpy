@@ -2,9 +2,6 @@ from ira.output import Output
 from machine import Pin
 from neopixel import NeoPixel
 
-import asyncio
-import sys
-
 
 class NeopixelOutput(Output):
     def __init__(self, cfg):

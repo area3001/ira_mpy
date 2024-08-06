@@ -1,0 +1,25 @@
+version: '3'
+tasks:
+  bootstrap:
+    dir: "firmware"
+    cmds:
+      - "echo '0.0.0' > version"
+      - "mpremote fs cp -r ira :"
+      - "mpremote fs cp -r fx :"
+      - "mpremote fs cp -r tarfile :"
+      - "mpremote fs cp main.py :"
+      - "mpremote fs cp uota.cfg :"
+      - "mpremote fs cp uota.py :"
+      - "mpremote fs cp utils.py :"
+      - "mpremote fs cp version :"
+
+  package:
+    dir: "firmware"
+    requires:
+      vars:
+        - VERSION
+    cmds:
+      - "echo {{.VERSION}} > version"
+      - "mkdir ../build || true"
+      - "tar -czf ../build/firmware-{{.VERSION}}.tar.gz *"
+      - "echo '{{.VERSION}};firmware-{{.VERSION}}.tar.gz' > ../build/latest"

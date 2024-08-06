@@ -11,6 +11,12 @@ But installing things alone is not enough, you will also need to configure your 
 ## Design
 The design of the system is described in the [Design](DESIGN.md) document.
 
+## Building a new firmware
+```shell
+task package VERSION=<major.minor.patch>
+```
+The copy the contents of the build folder to the ota http server
+
 ## TODO
 - Implement topic structure according to individual outputs
 - Implement FX

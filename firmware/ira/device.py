@@ -1,16 +1,12 @@
-import json
-
-from machine import Pin
-from neopixel import NeoPixel
-
 from ira import output_dmx
 from ira import output_neopixel
 from ira.fx import FxEngine
 
 
 class Device:
-    def __init__(self, cfg):
+    def __init__(self, cfg, version):
         self._cfg = cfg
+        self.version = version
         self.outputs = {}
         self.output_config = {}
 

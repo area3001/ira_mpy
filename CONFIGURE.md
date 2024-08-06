@@ -3,8 +3,9 @@
 ## Configuring Wifi
 Make sure you have uploaded the latest version
 Connect to the ESP32 and enter the following commands on the REPL
+
 ```python
-from ira.config import Config
+from firmware.ira import Config
 cfg = Config()
 cfg.set_device_name("<your-device-name>")
 cfg.set_device_group("<your-device-group>")
@@ -28,7 +29,7 @@ Before you can do anything useful with the outputs, you need to configure them. 
 the device with the configuration. For example, to configure output 0 with a neopixel on pin 2 and a length of 26, you 
 can send the following message:
 ```commandline
-nats pub area3001.ira.<your-group>.devices.<your-id>.output.0.configure '{"kind": "neopixel", "pin": 2, "length": 26}'
+nats pub area3001.ira.<your-group>.devices.<your-id>.output.configure '{"channel": "1", "config":{"kind": "neopixel", "pin": 2, "length": 10}}'
 ```
 
 In theory, this should also allow for all devices in a group to be configured at once by targetting the group instead
