@@ -1,6 +1,11 @@
 import asyncio
 
 
+## Simple pixel effect that lights up each pixel in blue
+## run with:
+## fx.run '{"name": "pixel", "output": "1"}'
+## make sure the output exists and is passed as a string
+##
 async def run(device, config):
     print("running pixel fx on", config['output'])
     output = device.outputs[config['output']]
