@@ -31,8 +31,8 @@ async def run():
     version = open('version', 'r').read().strip()
 
     print('    IRA version {}'.format(version))
-    print('Subject: area3001.ira.{}.devices.{}'.format(cfg.get_device_group(), cfg.get_device_id()))
-    print('Device Name:', cfg.get_device_name())
+    print('Subject: area3001.ira.{}.devices.{}'.format(cfg.get_device_group(), cfg.get_device_name()))
+    print('Device ID:', cfg.get_device_id())
     print('Hardware:', cfg.get_device_hardware())
     print('Wifi SSID:', cfg.get_wifi_ssid(), 'Hidden:', cfg.get_wifi_hidden())
 

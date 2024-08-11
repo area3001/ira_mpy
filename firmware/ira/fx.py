@@ -20,6 +20,7 @@ def list_fx(upl, dev, data):
 def load_fx(upl, dev, data):
     ffx = json.loads(data)
     dev.fx.load(ffx['name'], ffx['source'])
+    return {"success": True, "msg": "effect loaded"}
 
 
 def run_fx(upl, dev, data):

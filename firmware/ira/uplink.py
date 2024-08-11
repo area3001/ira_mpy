@@ -56,7 +56,7 @@ class Uplink:
 
         await self.c.connect()
         await self.c.subscribe(
-            'area3001.ira.{}.devices.{}.>'.format(self.cfg.get_device_group(), self.cfg.get_device_id()),
+            'area3001.ira.{}.devices.{}.>'.format(self.cfg.get_device_group(), self.cfg.get_device_name()),
             self._parse_message)
         await self.c.subscribe(
             'area3001.ira.{}.devices.all.>'.format(self.cfg.get_device_group()),
