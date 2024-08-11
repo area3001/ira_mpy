@@ -10,14 +10,14 @@ tasks:
     dir: "firmware"
     cmds:
       - "echo '0.0.0' > version"
-      - "mpremote fs cp -r ira :"
-      - "mpremote fs cp -r fx :"
-      - "mpremote fs cp -r tarfile :"
-      - "mpremote fs cp main.py :"
-      - "mpremote fs cp uota.cfg :"
-      - "mpremote fs cp uota.py :"
-      - "mpremote fs cp utils.py :"
-      - "mpremote fs cp version :"
+      - "mpremote u0 fs cp -r ira :"
+      - "mpremote u0 fs cp -r fx :"
+      - "mpremote u0 fs cp -r tarfile :"
+      - "mpremote u0 fs cp main.py :"
+      - "mpremote u0 fs cp uota.cfg :"
+      - "mpremote u0 fs cp uota.py :"
+      - "mpremote u0 fs cp utils.py :"
+      - "mpremote u0 fs cp version :"
 
   configure:
     requires:
