@@ -7,6 +7,8 @@ import sys
 
 from ira import nats
 import uota
+from ira.logger import Logger
+
 
 class Uplink:
     def __init__(self, cfg):
@@ -16,6 +18,7 @@ class Uplink:
 
         self.endpoints = {}
         self.handlers = {}
+        self.logger = Logger(cfg, self)
 
     def is_connectable(self):
         return self.cfg.get_wifi_ssid() is not None
@@ -58,11 +61,18 @@ class Uplink:
         await self.c.subscribe(
             'area3001.ira.{}.devices.{}.>'.format(self.cfg.get_device_group(), self.cfg.get_device_name()),
             self._parse_message)
+        await self.logger.log('info', 'Listening for incoming messages on area3001.ira.{}.devices.{}.>'.format(
+            self.cfg.get_device_group(), self.cfg.get_device_name()))
+
         await self.c.subscribe(
             'area3001.ira.{}.devices.all.>'.format(self.cfg.get_device_group()),
             self._parse_message)
+        await self.logger.log('info', 'Listening for incoming messages on area3001.ira.{}.devices.all.>'.format(
+            self.cfg.get_device_group()))
 
         asyncio.create_task(self.c.wait())
+
+
 
     async def close(self):
         await self.c.close()
@@ -90,8 +100,7 @@ class Uplink:
                 raise ValueError('Unknown command %s' % handler_id)
 
         except Exception as t:
-            # raise t
-            print('Failed to process message \"%s\": %s' % (msg.data, t))
+            await self.logger.log('error', 'Failed to process message "%s": %s' % (msg.data, t))
             sys.print_exception(t)
 
 

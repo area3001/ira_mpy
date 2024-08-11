@@ -1,8 +1,10 @@
 import asyncio
+import sys
 
 from ira import config, system
 from ira.beater import Beater
 from ira.device import Device
+from ira.logger import Logger
 from ira.uplink import Uplink
 from ira import output, fx
 
@@ -57,6 +59,7 @@ async def run():
             await upl.connect()
         except Exception as e:
             print('Error connecting:', e)
+            sys.print_exception(e)
 
     output.link_output(upl, dev)
     fx.link_fx(upl, dev)

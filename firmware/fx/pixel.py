@@ -2,7 +2,7 @@ import asyncio
 
 
 async def run(device, config):
-    print("running pixel fx on ", config['output'])
+    print("running pixel fx on", config['output'])
     output = device.outputs[config['output']]
 
     while True:

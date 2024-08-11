@@ -10,14 +10,26 @@ tasks:
     dir: "firmware"
     cmds:
       - "echo '0.0.0' > version"
-      - "mpremote u0 fs cp -r ira :"
-      - "mpremote u0 fs cp -r fx :"
-      - "mpremote u0 fs cp -r tarfile :"
-      - "mpremote u0 fs cp main.py :"
-      - "mpremote u0 fs cp uota.cfg :"
-      - "mpremote u0 fs cp uota.py :"
-      - "mpremote u0 fs cp utils.py :"
-      - "mpremote u0 fs cp version :"
+      - "mpremote fs cp -r ira :"
+      - "mpremote fs cp -r fx :"
+      - "mpremote fs cp -r tarfile :"
+      - "mpremote fs cp main.py :"
+      - "mpremote fs cp uota.cfg :"
+      - "mpremote fs cp uota.py :"
+      - "mpremote fs cp utils.py :"
+      - "mpremote fs cp version :"
+
+  upload:
+    dir: "firmware"
+    cmds:
+      - "mpremote fs cp -r ira :"
+      - "mpremote fs cp -r fx :"
+      - "mpremote fs cp -r tarfile :"
+      - "mpremote fs cp main.py :"
+      - "mpremote fs cp uota.cfg :"
+      - "mpremote fs cp uota.py :"
+      - "mpremote fs cp utils.py :"
+      - "mpremote fs cp version :"
 
   configure:
     requires:
@@ -25,10 +37,10 @@ tasks:
         - NAME
         - VERSION
         - GROUP
+        - SSID
+        - PASSWORD
     vars:
       HARDWARE: "ira"
-      SSID: "triggerwear"
-      PASSWORD: "spacehacker"
     cmd: mpremote exec 'from ira.config import Config; c = Config(); c.set_device_name("{{.NAME}}"); c.set_device_hardware("{{.HARDWARE}}"); c.set_device_version("{{.VERSION}}"); c.set_device_group("{{.GROUP}}"); c.set_wifi_ssid("{{.SSID}}"); c.set_wifi_password("{{.PASSWORD}}"); c.persist()'
 
   package:

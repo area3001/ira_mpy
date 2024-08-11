@@ -32,7 +32,9 @@ def run_fx(upl, dev, data):
     if _fx:
         _fx.cancel()
 
-    _fx = asyncio.create_task(_run_effect(dev, name, data))
+    _fx = asyncio.create_task(_run_effect(dev, name, pl, upl.logger))
+
+    return {"success": True, "msg": "effect start requested"}
 
 
 def stop_fx(upl, dev, data):
@@ -42,13 +44,18 @@ def stop_fx(upl, dev, data):
         _fx.cancel()
         _fx = None
 
+    return {"success": True, "msg": "effect stopped"}
 
-async def _run_effect(dev, name, data):
+
+async def _run_effect(dev, name, data, logger):
     try:
         exec('import fx.' + name, {})
+
+        await logger.log("info", "effect {} imported".format(name))
+
         await sys.modules['fx.' + name].run(dev, data)
     except Exception as e:
-        print(e)
+        await logger.log("error", "failed to run effect: {}".format(e))
         sys.print_exception(e)
 
 
