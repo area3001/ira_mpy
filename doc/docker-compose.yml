@@ -1,0 +1,25 @@
+version: "3.4"
+services:
+  nats:
+    image: nats:latest
+    restart: always
+    command: "-c /etc/nats/nats.conf"
+    volumes:
+      - /home/triggerwear/ira/nats/nats.conf:/etc/nats/nats.conf:ro
+      - /home/triggerwear/ira/nats/data:/data:rw
+    ports:
+      - "4222:4222"
+      - "9001:9001"
+
+  web:
+    restart: always
+    build: https://github.com/DrSkunk/fri3d-ira-web-vite.git
+    ports:
+      - "3000:3000"
+
+  nginx:
+    image: nginx:1-alpine
+    ports:
+      - "80:80"
+    volumes:
+      - /home/triggerwear/ira/firmware:/usr/share/nginx/html
