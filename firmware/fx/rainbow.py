@@ -28,17 +28,19 @@ def wheel(index:int, brightness:int=255) -> tuple(int,int,int):
 ##
 async def run(device, config):
     print(config)
-    print("running rainbow fx on", config['output'])
+    print("running rainbow fx on", config)
 
     max_length = 0    
     devices = []
     for out_id in device.outputs:
-        devices.append((device.outputs[out_id],device.outputs[out_id].length(),360/device.outputs[out_id].length()))
-        max_length = max(max_length,device.outputs[out_id].length())
+        devices.append((device.outputs[out_id],device.outputs[out_id].rgb_length(),360/device.outputs[out_id].rgb_length()))
+        max_length = max(max_length,device.outputs[out_id].rgb_length())
 
     brightness = 128
+    gap=3
     if "brightness" in config and type(config["brightness"]) == int:
         brightness = config["brightness"]
+
     do_sparkle = True
     if "nosparkle" in config and config["nosparkle"] == 1:
         do_sparkle = False

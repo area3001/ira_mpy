@@ -1,4 +1,5 @@
 import asyncio
+import json
 import sys
 
 import machine
@@ -46,6 +47,11 @@ async def run():
     # load the device configuration
     dev.load()
 
+    # load the default effect
+    args = json.loads('{"name": "rainbow", "nosparkles": 1}')
+    dev.fx.run('rainbow', args, Logger(cfg, None))
+    print("loaded default effect")
+
     # check if the device is connectable
     print("waiting to be configured", end="")
     while not upl.is_connectable():
@@ -69,6 +75,9 @@ async def run():
 
     beater = Beater(cfg, upl, dev)
     asyncio.create_task(beater.run())
+
+    args = json.loads('{"name": "rainbow", "nosparkles": 0}')
+    dev.fx.run('rainbow', args, Logger(cfg, None))
 
     while upl.is_connected():
         await asyncio.sleep(5)

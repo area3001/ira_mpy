@@ -19,11 +19,6 @@ class Device:
         for channel in self.output_config:
             self.load_output(channel, self.output_config[channel])
 
-        # load the default effect
-        args = json.loads('{"name": "rainbow", "nosparkles": 1}')
-        self.fx.run('rainbow', args, Logger(self._cfg, None))
-        print("loaded default effect")
-
     def save(self):
         self._cfg.set_json('outputs', self.output_config)
         self._cfg.persist()

@@ -73,4 +73,13 @@ tasks:
       - "echo {{.VERSION}} > version"
       - "mkdir ../build || true"
       - "tar -czf ../build/firmware-{{.VERSION}}.tar.gz *"
-      - "echo '{{.VERSION}};firmware-{{.VERSION}}.tar.gz' > ../build/latest"
+      - "echo \"{{.VERSION}};firmware-{{.VERSION}}.tar.gz;0;$(sha256sum ../build/firmware-{{.VERSION}}.tar.gz |cut -d ' ' -f1)\" > ../build/latest"
+
+  publish:
+    dir: "firmware"
+    requires:
+      vars:
+        - VERSION
+    cmds:
+      - "scp ../build/firmware-{{.VERSION}}.tar.gz triggerwear@fri3d.wombat.dev:~/ira/firmware/stable/"
+      - "scp ../build/latest triggerwear@fri3d.wombat.dev:~/ira/firmware/stable/"
