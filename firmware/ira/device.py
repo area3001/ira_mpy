@@ -2,7 +2,7 @@ from ira import output_dmx
 from ira import output_neopixel
 from ira.fx import FxEngine
 from ira.logger import Logger
-
+import json
 
 class Device:
     def __init__(self, cfg, version):
@@ -20,7 +20,8 @@ class Device:
             self.load_output(channel, self.output_config[channel])
 
         # load the default effect
-        self.fx.run('pixel', '{"name": "pixel"}', Logger(self._cfg, None))
+        args = json.loads('{"name": "rainbow", "nosparkles": 1}')
+        self.fx.run('rainbow', args, Logger(self._cfg, None))
         print("loaded default effect")
 
     def save(self):
