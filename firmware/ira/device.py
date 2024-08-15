@@ -1,6 +1,7 @@
 from ira import output_dmx
 from ira import output_neopixel
 from ira.fx import FxEngine
+from ira.logger import Logger
 
 
 class Device:
@@ -17,6 +18,10 @@ class Device:
 
         for channel in self.output_config:
             self.load_output(channel, self.output_config[channel])
+
+        # load the default effect
+        #self.fx.run('pixel', '{"name": "pixel"}', Logger(self._cfg, None))
+        #print("loaded default effect")
 
     def save(self):
         self._cfg.set_json('outputs', self.output_config)

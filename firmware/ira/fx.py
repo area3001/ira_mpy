@@ -4,7 +4,6 @@ import json
 import os
 import sys
 
-_fx = None
 
 def link_fx(upl, dev):
     upl.register_handler('fx.run', lambda data: run_fx(upl, dev, data))
@@ -24,26 +23,13 @@ def load_fx(upl, dev, data):
 
 
 def run_fx(upl, dev, data):
-    global _fx
-
     pl = json.loads(data)
-    name = pl['name']
-
-    if _fx:
-        _fx.cancel()
-
-    _fx = asyncio.create_task(_run_effect(dev, name, pl, upl.logger))
-
+    dev.fx.run(pl['name'], pl, upl.logger)
     return {"success": True, "msg": "effect start requested"}
 
 
 def stop_fx(upl, dev, data):
-    global _fx
-
-    if _fx:
-        _fx.cancel()
-        _fx = None
-
+    dev.fx.stop()
     return {"success": True, "msg": "effect stopped"}
 
 
@@ -71,3 +57,15 @@ class FxEngine:
         with open('/fx/' + name + '.py', 'w') as f:
             f.write(binascii.a2b_base64(sourcecode).decode('utf-8'))
         print('loaded effect', name)
+
+    def run(self, name, args, logger):
+        # stop the current fx
+        self.stop()
+
+        # start the new fx
+        self._current = asyncio.create_task(_run_effect(self._dev, name, args, logger))
+
+    def stop(self):
+        if self._current:
+            self._current.cancel()
+            self._current = None

@@ -1,6 +1,8 @@
 import asyncio
 import sys
 
+import machine
+
 from ira import config, system
 from ira.beater import Beater
 from ira.device import Device
@@ -72,5 +74,6 @@ async def run():
         await asyncio.sleep(5)
 
     print('disconnected, restarting')
+    machine.reset()
 
 main()

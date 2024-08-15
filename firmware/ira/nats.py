@@ -213,8 +213,11 @@ class Connection(object):
         if self._debug:
             print('<< {}'.format(msg))
 
-        self._writer.write(msg)
-        await self._writer.drain()
+        if self._writer:
+            self._writer.write(msg)
+            await self._writer.drain()
+        else:
+            raise ValueError('Connection is closed')
 
     async def _readline(self):
         lines = []

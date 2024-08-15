@@ -15,9 +15,18 @@ class Beater:
             await asyncio.sleep(10)
 
     async def beat(self):
-        await self._upl.c.publish(
-            'area3001.ira.{}.devices.{}'.format(self._cfg.get_device_group(), self._cfg.get_device_name()),
-            self._heartbeat_msg())
+        if not self._upl.is_connected():
+            print("not beating; not connected")
+            return
+
+        try:
+            await self._upl.c.publish(
+                'area3001.ira.{}.devices.{}'.format(self._cfg.get_device_group(), self._cfg.get_device_name()),
+                self._heartbeat_msg())
+        except Exception as e:
+            print('Error sending heartbeat:', e)
+            gc.collect()
+            return
 
     def _heartbeat_msg(self):
         return json.dumps({
