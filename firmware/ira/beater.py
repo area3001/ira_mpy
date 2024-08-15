@@ -36,5 +36,6 @@ class Beater:
             'handlers': [k for k in self._upl.handlers.keys()],
             'mem_free': gc.mem_free(),
             'mem_alloc': gc.mem_alloc(),
+            'rssi': self._upl.get_rssi(),
             'temperature': (esp32.raw_temperature() - 32.0) / 1.8
         })

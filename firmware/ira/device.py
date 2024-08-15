@@ -20,8 +20,8 @@ class Device:
             self.load_output(channel, self.output_config[channel])
 
         # load the default effect
-        #self.fx.run('pixel', '{"name": "pixel"}', Logger(self._cfg, None))
-        #print("loaded default effect")
+        self.fx.run('pixel', '{"name": "pixel"}', Logger(self._cfg, None))
+        print("loaded default effect")
 
     def save(self):
         self._cfg.set_json('outputs', self.output_config)

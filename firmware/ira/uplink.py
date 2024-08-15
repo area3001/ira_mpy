@@ -26,6 +26,9 @@ class Uplink:
     def is_connected(self):
         return self.wlan is not None and self.wlan.isconnected()
 
+    def get_rssi(self):
+        return self.wlan.status('rssi')
+
     async def connect(self):
         if self.is_connected():
             print('already connected')
@@ -37,8 +40,8 @@ class Uplink:
         self.wlan.active(False)
         self.wlan.active(True)
 
-        if self.cfg.get_wifi_hidden() == 1:
-            self.wlan.config(ssid=self.cfg.get_wifi_ssid(), hidden=True)
+        # if self.cfg.get_wifi_hidden() == 1:
+        #     self.wlan.config(ssid=self.cfg.get_wifi_ssid(), hidden=True)
 
         print("Connecting to router...")
         self.wlan.connect(self.cfg.get_wifi_ssid(), self.cfg.get_wifi_password())
@@ -50,6 +53,7 @@ class Uplink:
             await asyncio.sleep(1)
 
         print('Network config:', self.wlan.ifconfig())
+        await asyncio.sleep_ms(500)
 
         if uota.check_for_updates():
             uota.install_new_firmware()
