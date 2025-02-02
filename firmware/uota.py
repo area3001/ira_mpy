@@ -114,13 +114,17 @@ def check_for_updates(version_check=True, quiet=False, pubkey_hash=b'') -> bool:
     if 'user' in ota_config and 'password' in ota_config:
         auth = (ota_config['user'], ota_config['password'])
 
-    response = urequests.get(ota_config['url'] + 'latest', auth=auth)
+    try:
+        response = urequests.get(ota_config['url'] + 'latest', auth=auth)
+    except:
+        log.error('Cannot connect to the update server!')
+        return False
 
     if response.status_code == 401:
         log.error('Invalid or missing basic HTTP authentication!')
         return False
     if response.status_code != 200:
-        log.error('Other error: ' + response.status_code + " " + response.reason)
+        log.error('Other error: ' + str(response.status_code) + " " + response.reason)
         return False
 
     if ucertpin_available and pubkey_hash:

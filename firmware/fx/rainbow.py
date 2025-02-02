@@ -52,7 +52,7 @@ async def run(device, config):
                 for i in range(_device[1]):
                     _device[0].rgb_set(i, wheel(int(i*_device[2])+j, brightness))
                 if do_sparkle and j % 5 == 0:
-                    device[0].rgb_set(random.randint(0,device[1]-1),(255,255,255))
+                    _device[0].rgb_set(random.randint(0,_device[1]-1),(255,255,255))
                 _device[0].rgb_write()
             await asyncio.sleep_ms(33)
         

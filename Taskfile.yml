@@ -12,18 +12,18 @@ tasks:
       - task: bootstrap
       - task: configure
         vars:
-          SERVER: "nats://10.60.0.30:4222"
-          SSID: "triggerwear"
-          PASSWORD: "spacehacker"
+          SERVER: "nats://demo.nats.io:4222"
+          SSID: "ORBI"
+          PASSWORD: "phobicviolin114"
           SSID_HIDDEN: 0
           VERSION: "IRA-BOX24"
       - mpremote reset
 
   erase:
-    cmd: esptool.py --chip esp32 --baud 460800 --port /dev/cu.usbserial-110 erase_flash
+    cmd: esptool.py --chip esp32 --baud 460800 --port /dev/cu.usbserial-210 erase_flash
 
   flash:
-    cmd: esptool.py --chip esp32 --baud 460800 --port /dev/cu.usbserial-110 write_flash -z 0x1000 ~/Downloads/ESP32_GENERIC-SPIRAM-20231005-v1.21.0.bin
+    cmd: esptool.py --chip esp32 --baud 460800 --port /dev/cu.usbserial-210 write_flash -z 0x1000 ~/Downloads/ESP32_GENERIC-SPIRAM-20231005-v1.21.0.bin
 
   bootstrap:
     dir: "firmware"
@@ -63,6 +63,9 @@ tasks:
     vars:
       HARDWARE: "ira"
     cmd: mpremote exec 'from ira.config import Config; c = Config(); c.set_device_name("{{.NAME}}"); c.set_device_hardware("{{.HARDWARE}}"); c.set_device_version("{{.VERSION}}"); c.set_device_group("{{.GROUP}}"); c.set_wifi_ssid("{{.SSID}}"); c.set_wifi_password("{{.PASSWORD}}"); c.set_server("{{.SERVER}}"); c.persist()'
+
+#  usb_config:
+#    cmd: mpremote exec 'from ira.config import Config; c = Config(); c.set_json("outputs", {"0": {"kind": "neopixel", "pin": 2, "length": 26}}); c.persist()'
 
   package:
     dir: "firmware"
